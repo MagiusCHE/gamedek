@@ -1,0 +1,10 @@
+{
+    "log": {
+        "namespaceFormat": "{%s}",
+        "trace": true,
+        "loadjson": true
+    },
+    "debug": {
+        "version": true
+    }
+}

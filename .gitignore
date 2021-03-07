@@ -1,0 +1,5 @@
+/dist
+package-json.lock
+*.log
+node_modules
+/appData

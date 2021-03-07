@@ -1,0 +1,65 @@
+{
+  "name": "it.magius.gamedek",
+  "version": "0.0.1",
+  "productName": "GameDek",
+  "productTitle": "GameDek",
+  "description": "Fancy themable panel to place all game links.",
+  "main": "desktop.js",
+  "author": {
+    "name": "Magius(CHE)",
+    "email": "magiusche@magius.it"
+  },
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "electron . --develop",
+    "release": "electron-builder",
+    "dist:linux": "yarn release -l",
+    "dist:linux:deb": "yarn release -l deb",
+    "dist:linux:targz": "yarn release -l tar.gz",
+    "dist:linux:appimage": "yarn release -l AppImage",
+    "dist:linux:snap": "yarn release -l snap",
+    "dist:win": "yarn release -w",
+    "publish:draft:_common": "yarn release --publish always",
+    "publish:draft:linux": "yarn publish:draft:_common -l",
+    "publish:draft:win": "yarn publish:draft:_common -w",
+    "publish:draft": "yarn publish:draft:_common -wl"
+  },
+  "dependencies": {
+    "@electron/remote": "^1.0.4",
+    "command-line-parser": "^0.1.10",
+    "electron-default-menu": "^1.0.2",
+    "mkdirp": "^1.0.4",
+    "platform-folders": "^0.5.2"
+  },
+  "build": {
+    "appId": "it.magius.gamedek",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "linux": {
+      "asar": true,
+      "category": "Game",
+      "packageCategory": "Game",
+      "executableName": "gamedek",
+      "synopsis": "GameDek",
+      "description": "Fancy themable panel to place all game links.",
+      "desktop": {
+        "Name": "GameDek",
+        "Comment": "Fancy themable panel to place all game links.",
+        "StartupWMClass": "GameDek"
+      },
+      "target": [
+        "deb",
+        "rpm",
+        "tar.gz",
+        "AppImage"
+      ]
+    },
+    "win": {
+      "target": "7z",
+      "asar": true
+    }    
+  },
+  "devDependencies": {
+    "electron": "^12.0.0"
+  }
+}

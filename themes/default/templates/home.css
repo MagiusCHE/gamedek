@@ -1,0 +1,32 @@
+﻿[data-jh-tpl="home"] .background {
+    background-image: url('../content/images/home_bkg.jpg');
+    filter: blur(2px);
+    z-index:0;
+}
+
+[data-jh-tpl="home"] .options
+{
+    display:inline-block;
+}
+
+[data-jh-tpl="home"] .optioncontent {
+    margin-bottom: 2rem;    
+}
+
+[data-jh-tpl="home"] .button {
+    font-family: "Morpheus";
+    font-size: 2rem;
+    margin-bottom: 0.2rem;
+    width: 20rem;
+    filter: grayscale(0.5) drop-shadow(3px 5px 4px #000);
+    /*box-shadow: 2px 2px 21px #000;*/
+}
+
+[data-jh-tpl="home"] .button:hover {
+    filter: grayscale(0) drop-shadow(-3px -5px 4px #000);
+    /*box-shadow: 2px 2px 21px #000;*/
+}
+
+#csscontroller #home_loaded {
+    width: 100px;
+}
