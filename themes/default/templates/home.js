@@ -1,5 +1,5 @@
-﻿(function() {
-    core.views.home = {
+﻿(async () => {
+    const $this = {
         eanblebackgroundMoveOnMouse: true,
         show: function(cb) {
             $this.content.find('#newgame').click(() => {
@@ -40,7 +40,9 @@
             })
         },
     };
-    const $this = core.views.home;
+
+    await core.theme.onJSLoaded('home', $this)
+
     // eslint-disable-next-line no-unused-vars
     const log = core.log
 })();

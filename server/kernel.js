@@ -156,6 +156,12 @@ const $this = {
     getThemeUrl: async function({ relativePath }) {
         return 'file://' + path.join($this.themeFullPath, relativePath)
     },
+    getThemePath: async function({ relativePath }) {
+        return path.join($this.themeFullPath, relativePath)
+    },
+    existsThemeFile: async function({ relativePath }) {
+        return fs.existsSync(path.join($this.themeFullPath, relativePath))
+    },
     clientOptions: undefined,
     applicationStart: async function({ options }) {
         $this.clientOptions = {

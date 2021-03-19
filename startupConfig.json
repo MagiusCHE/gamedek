@@ -2,7 +2,9 @@
     "log": {
         "namespaceFormat": "{%s}",
         "trace": true,
-        "loadjson": true
+        "loadjson": true,
+        "loadjs": true,
+        "loadhtml": true
     },
     "debug": {
         "version": true

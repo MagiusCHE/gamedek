@@ -158,10 +158,10 @@ let core = {};
                     args = margs
                 )
             }
-
+            arguments[0] = `{${arguments[0]}}`
             const diff = getTickCount() - $this._lastLog
             $this._lastLog = getTickCount()
-            Array.push.call(arguments, diff + 'ms');
+            Array.push?.call(arguments, diff + 'ms');
             let console = this.console;
             if (!console) {
                 console = window.console;
@@ -185,6 +185,7 @@ let core = {};
             }
             const diff = getTickCount() - $this._lastLog
             $this._lastLog = getTickCount()
+            arguments[0] = `{${arguments[0]}}`
             arguments[arguments.length] = '+' + diff + 'ms';
             arguments.length++
             //arguments.unshift(diff + 'ms')
@@ -194,9 +195,12 @@ let core = {};
             }
             if (console !== undefined) {
                 if (console != null) {
-                    if ($this.options.debug.logtrace) {
+                    if ($this.options.log.trace) {
                         console.groupCollapsed.apply(console, arguments);
-                        console.trace("Stacktrace");
+                        //console.trace("Stacktrace");
+                        const trace = new Error().stack.split('\n')
+                        trace.splice(0, 3)
+                        console.log(trace.join('\n'))
                         console.groupEnd();
                     }
                     else
@@ -256,8 +260,7 @@ let core = {};
             });
         },
         loadedjs: {},
-        loadJS: async (urls, controls) => {
-
+        loadJS: async (urls, controls) => {            
             return new Promise(resolve => {
                 if (!Array.isArray(urls)) {
                     urls = [urls];
@@ -265,6 +268,9 @@ let core = {};
                 const s = document.getElementsByTagName('head')[0];
                 let toload = urls.length;
                 for (let h = 0; h < urls.length; h++) {
+                    if ($this.options.log.loadjs) {
+                        log('Loading JS', urls[h])
+                    }
                     const ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = false;
                     $(ga).on('load', function() {
                         toload--;
@@ -389,6 +395,15 @@ let core = {};
 
 
                 const thememanifest = await $this.loadJSON((await $this.kernel.getThemeUrl('manifest.json')))
+
+                if (await $this.kernel.existsThemeFile('theme.js')) {
+                    $this.theme.isLoaded = false
+                    log('Wait for theme is loaded...')
+                    await $this.loadJS((await $this.kernel.getThemeUrl('theme.js')))
+                    await waitFor(() => $this.theme.isLoaded)
+                }
+
+                log('Initialize theme...')
 
                 await $this.theme.init(thememanifest)
 
@@ -1293,6 +1308,24 @@ let core = {};
             }
             var newone = cnt[0].cloneNode(true);
             cnt[0].parentNode.replaceChild(newone, cnt[0]);
+        },
+        overrideTheme: function(obj) {
+            const parent = $this.theme
+            $this.theme = obj
+            for (const prop in parent) {
+                if ($this.theme[prop] === undefined) {
+                    if (isFunction(parent[prop], true)) {
+                        $this.theme[prop] = async function() {
+                            return parent[prop].apply(parent[prop], arguments)
+                        }
+                    } else if (isFunction(parent[prop])) {
+                        $this.theme[prop] = function() {
+                            return parent[prop].apply(parent[prop], arguments)
+                        }
+                    }
+                }
+            }
+            return parent
         }
     };
     const $this = core;
@@ -1354,9 +1387,9 @@ function formatTime(ticks, removeseconds) {
     return ret += padLeft('' + hours, 2, '0') + ':' + padLeft('' + minutes, 2, '0') + (!removeseconds ? (':' + padLeft('' + secs, 2, '0')) : '');
 }
 
-function isFunction(functionToCheck) {
+function isFunction(functionToCheck, onlyasync) {
     const getType = {};
-    return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+    return functionToCheck && [onlyasync ? '[fakeme]' : '[object Function]', '[object AsyncFunction]'].indexOf(getType.toString.call(functionToCheck)) > -1;
 }
 
 if (!String.prototype.replaceAll) {
@@ -1450,12 +1483,17 @@ const waitFor = async function(stringVariable_orCallback, callback, deftimeout) 
         if (typeof stringVariable_orCallback === 'string') {
             const totvars = stringVariable_orCallback.split(',');
             for (let i = 0; i < totvars.length; i++) {
-                const ev = eval(totvars[i]);
-                if (!ev) {
-                    setTimeout(function() {
-                        waitFor(stringVariable_orCallback, callback);
-                    }, deftimeout);
-                    return;
+                try {
+                    const ev = eval(totvars[i]);
+                    if (!ev) {
+                        setTimeout(function() {
+                            waitFor(stringVariable_orCallback, callback);
+                        }, deftimeout);
+                        return;
+                    }
+                } catch (Err) {
+                    core.logError("Core", new Error(`Error while eval: "${totvars[i]}"`))
+                    throw Err
                 }
             }
             callback();
