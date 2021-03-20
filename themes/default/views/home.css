@@ -1,0 +1,13 @@
+﻿
+[data-gd-view="home"] .background {
+    background-image: url('../media/home.jpg');
+    filter: blur(2px);
+}
+
+[data-gd-view="home"] .app-view{
+
+}
+
+#csscontroller #home_loaded {
+    width: 100px;
+}

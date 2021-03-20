@@ -25,7 +25,7 @@ function createWindow() {
             //nodeIntegration: false,
             //enableRemoteModule: true
         },
-        show: false,
+        show: true, //argsObj.develop ? true : false,
         frame: argsObj.develop ? true : false,
     })
 

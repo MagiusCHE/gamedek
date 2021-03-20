@@ -1,0 +1,48 @@
+html, body, .gd-viewscontainer {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+body.gd-body{
+    font-family: 'Exo 2', sans-serif ;
+    font-weight: 200;
+}
+
+.gd-viewscontainer {
+    top:0px;
+    left:0px;
+    position: absolute;
+}
+.gd-view{
+    top:0px;
+    left:0px;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(42, 42, 42);
+    color:#c5c5c5;
+
+}
+
+.gd-view > .background {
+    z-index:0;
+    width: 100%;
+    height: 100%;
+    top:0px;
+    left:0px;
+    position: absolute;
+}
+
+.gd-view > .app-view{
+    top:0px;
+    left:0px;
+    position: absolute;
+    z-index: 1;
+}
+
+#csscontroller #main_loaded {
+    width: 100px;
+}

@@ -4,9 +4,12 @@
         "trace": true,
         "loadjson": true,
         "loadjs": true,
-        "loadhtml": true
+        "loadhtml": true,
+        "loadimages": true,
+        "loadcss": true
     },
     "debug": {
         "version": true
-    }
+    },
+    "initialWindowAppearTimeout": 5000
 }

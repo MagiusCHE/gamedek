@@ -6,7 +6,21 @@
         "email": "magiusche@magius.it"
     },
     "repo": "https://github.com/MagiusCHE/gamedek-themes/default.git",
-    "templates": [
+    "images": [
+        "media/*"
+    ],
+    "scripts": [
+        "3th/jquery-ui/jquery-ui.min.js"
+    ],
+    "styles": {
+        "3th/jquery-ui/jquery-ui.min.css": "main_loaded",
+        "3th/jquery-ui/jquery-ui.structure.min.css": "main_loaded",
+        "3th/jquery-ui/jquery-ui.theme.min.css": "main_loaded",
+        "3th/bootstrap.min.css": "main_loaded",
+        "main.css": "main_loaded",
+        "fonts.css": "fonts_loaded"
+    },
+    "views": [
         "home"
     ],
     "entry": "home"

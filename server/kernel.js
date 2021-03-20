@@ -154,13 +154,33 @@ const $this = {
     },
     themeFullPath: undefined,
     getThemeUrl: async function({ relativePath }) {
-        return 'file://' + path.join($this.themeFullPath, relativePath)
+        return 'file://' + $this.securePath($this.themeFullPath, relativePath)
+    },
+    getThemeUrls: async function({ relativePath }) {
+        const rpath = $this.securePath($this.themeFullPath, relativePath)
+        const ret = []
+        if (rpath) {
+            for (const file of fs.readdirSync(rpath)) {
+                if (fs.statSync(path.join(rpath, file)).isDirectory()) {
+                    continue
+                }
+                ret.push('file://' + path.join(rpath, file))
+            }
+        }
+        return ret;
     },
     getThemePath: async function({ relativePath }) {
-        return path.join($this.themeFullPath, relativePath)
+        return $this.securePath($this.themeFullPath, relativePath)
     },
     existsThemeFile: async function({ relativePath }) {
-        return fs.existsSync(path.join($this.themeFullPath, relativePath))
+        return fs.existsSync($this.securePath($this.themeFullPath, relativePath))
+    },
+    securePath: (root, rel) => {
+        const ret = path.resolve(path.join(root, rel))
+        if (ret.indexOf(root) != 0) {
+            throw new Error("Unauthorized path requested.")
+        }
+        return ret
     },
     clientOptions: undefined,
     applicationStart: async function({ options }) {

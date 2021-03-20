@@ -2,36 +2,26 @@
 /* eslint-disable require-jsdoc */
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
-let core = {};
-(function() {
-    core = {
+(async () => {
+
+    const $this = {
         appVersion: '0.1a-1',
         changelog: {
             '0.1a': [
                 '07/03/2021: Initialization.',
             ],
         },
-        scripts: {
-            '3th/jquery-ui/jquery-ui.min.js': '',
-            //'3th/mersenne-twister.js': '',
-            '3th/md5.min.js': '',
-            //'scripts/images.js': '',            
+        scripts: [
+            '3th/md5.min.js',
+            'scripts/theme.js',
+            'scripts/themeview.js'
+        ],
+        styles: {            
         },
-        styles: {
-            '3th/jquery-ui/jquery-ui.min.css': 'main_loaded',
-            '3th/jquery-ui/jquery-ui.structure.min.css': 'main_loaded',
-            '3th/jquery-ui/jquery-ui.theme.min.css': 'main_loaded',
-            '3th/bootstrap.min.css': 'main_loaded',
-            //'content/specialhl.css': 'sphl_loaded',
-            //'content/items.css': 'items_loaded',
-            '3th/animate.min.css': 'animate_loaded',
-        },
-
         options: {
             debug: {},
         },
         init: async () => {
-
             try {
                 $this.kernel = window.kernel
                 delete window.kernel
@@ -59,7 +49,7 @@ let core = {};
             return; */
                 }
 
-                $(window).resize(function() {
+                $(window).resize(() => {
                     $this.updateClientWindowSize();
                 });
 
@@ -88,11 +78,10 @@ let core = {};
                 document.addEventListener('mouseenter', onMouseUpdate, false);
 
                 // load jhspace
-                await $this.loadJS(['scripts/jhspace.js', 'scripts/theme.js']);
                 log('Initialized with options');
                 log($this.options);
 
-                await waitFor('core.theme')
+                //await waitFor(() => Theme && ThemeView) //exists theme class!
                 $this.splash();
             } catch (err) {
                 $this.kernel.criticalError(err)
@@ -104,7 +93,7 @@ let core = {};
         mousepos: { x: 0, y: 0 },
         startTime: new Date().getTime(),
         _rootUrl: undefined,
-        rootUrl: function() {
+        rootUrl: () => {
             if (!this._rootUrl) {
                 if ($('script[src*=\'core.js\']').length > 0) {
                     this._rootUrl = $('script[src*=\'core.js\']').attr('src').split('?')[0].split('core.js')[0] + '../';
@@ -159,6 +148,9 @@ let core = {};
                 )
             }
             arguments[0] = `{${arguments[0]}}`
+            if ($this._lastLog == -1) {
+                $this._lastLog = getTickCount()
+            }
             const diff = getTickCount() - $this._lastLog
             $this._lastLog = getTickCount()
             Array.push?.call(arguments, diff + 'ms');
@@ -172,7 +164,7 @@ let core = {};
                 }
             }
         },
-        _lastLog: getTickCount(),
+        _lastLog: -1,
         log: function() {
             if ($this.kernel) {
                 const margs = Array.from(arguments)
@@ -182,6 +174,9 @@ let core = {};
                     sender = margs.shift(),
                     args = margs
                 )
+            }
+            if ($this._lastLog == -1) {
+                $this._lastLog = getTickCount()
             }
             const diff = getTickCount() - $this._lastLog
             $this._lastLog = getTickCount()
@@ -195,7 +190,7 @@ let core = {};
             }
             if (console !== undefined) {
                 if (console != null) {
-                    if ($this.options.log.trace) {
+                    if ($this.options && $this.options.log && $this.options.log.trace) {
                         console.groupCollapsed.apply(console, arguments);
                         //console.trace("Stacktrace");
                         const trace = new Error().stack.split('\n')
@@ -210,7 +205,7 @@ let core = {};
         },
         loadJSON: async (url) => {
             if ($this.options.log.loadjson) {
-                log('Loading JSON', url)
+                log('Load JSON', url)
             }
             return new Promise(resolve => {
                 $.get(
@@ -218,6 +213,9 @@ let core = {};
                 ).done(function(obj) {
                     if (typeof obj === 'string' || obj instanceof String) {
                         obj = JSON.parse(obj);
+                    }
+                    if ($this.options.log.loadjson) {
+                        log('Loaded JSON', url)
                     }
                     resolve(obj);
                 }).fail(function(obj) {
@@ -260,7 +258,7 @@ let core = {};
             });
         },
         loadedjs: {},
-        loadJS: async (urls, controls) => {            
+        loadJS: async (urls, controls) => {
             return new Promise(resolve => {
                 if (!Array.isArray(urls)) {
                     urls = [urls];
@@ -268,12 +266,16 @@ let core = {};
                 const s = document.getElementsByTagName('head')[0];
                 let toload = urls.length;
                 for (let h = 0; h < urls.length; h++) {
+                    const url = urls[h]
                     if ($this.options.log.loadjs) {
-                        log('Loading JS', urls[h])
+                        log('Load JS', url)
                     }
                     const ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = false;
-                    $(ga).on('load', function() {
+                    $(ga).on('load', () => {
                         toload--;
+                        if ($this.options.log.loadjs) {
+                            log('Loaded JS', url)
+                        }
                     });
                     ga.src = $this.versionUrl(urls[h]);
                     s.appendChild(ga);
@@ -297,33 +299,38 @@ let core = {};
                     });
 
                     return tot === 0;
-                }, resolve);
+                }).then(resolve);
             })
         },
         loadCSS: async (urls, idselector4load) => {
             return new Promise(resolve => {
                 let ga;
-                let toload = 0;
+                let toload = urls.length;
                 for (let i = 0; i < urls.length; i++) {
                     const url = urls[i];
                     const idsel = idselector4load[i];
-                    toload = urls.length;
+                    if ($this.options.log.loadcss) {
+                        log('Load CSS', url)
+                    }
                     $('#csscontroller').append('<div id=\'' + idsel + '\'></div>');
                     const s = document.getElementsByTagName('head')[0];
                     ga = document.createElement('link'); ga.type = 'text/css'; ga.async = false;
                     ga.setAttribute('rel', 'stylesheet');
-                    waitFor(function() {
+                    waitFor(() => {
                         return $('#csscontroller #' + idsel).innerWidth() === 100;
-                    }, function() {
+                    }).then(() => {
                         toload--;
+                        if ($this.options.log.loadcss) {
+                            log('Loaded CSS', url)
+                        }
+                        if (toload == 0) {
+                            resolve()
+                        }
                     });
                     ga.href = $this.versionUrl(url);
                     ga.setAttribute('data-src', url);
                     s.appendChild(ga);
                 }
-                waitFor(function() {
-                    return toload === 0;
-                }, resolve);
             })
         },
         loadImages: async (urls) => {
@@ -334,29 +341,38 @@ let core = {};
                 }
 
                 const imgs = [];
-                $.each(urls, function(idx, url) {
+
+                for (const url of urls) {
                     const img = new Image();
+                    if ($this.options.log.loadimages) {
+                        log('Load Image', url)
+                    }
                     img.src = core.versionUrl(url);
                     imgs.push(img);
-                });
+                }
+                const loaded = {}
                 waitFor(() => {
                     let tot = 0;
-                    $.each(imgs, function(idx, img) {
+                    for (const img of imgs) {
                         tot += img.naturalWidth > 0 ? 1 : 0;
-                    });
+                        if (img.naturalWidth > 0 && $this.options.log.loadimages && !loaded[img.src]) {
+                            loaded[img.src] = true
+                            log('Loaded Image', img.src)
+                        }
+                    }
                     return tot == imgs.length;
-                }, resolve);
+                }).then(resolve);
             });
         },
         _loader: undefined,
-        showLoader: function() {
+        showLoader: () => {
             if (!this._loader) {
                 this._loader = new JHObject($('.app_container'), 'main_loader');
                 this._loader.addClass('main_loader anim-spin anim-spin-ease');
             }
             this._loader.fadeIn();
         },
-        hideLoader: function() {
+        hideLoader: () => {
             if (!this._loader) {
                 return;
             }
@@ -393,25 +409,35 @@ let core = {};
                         $this.mouseButtonPressed.right = false;
                 });
 
+                let tot = $this.scripts.length
+                for (const js of $this.scripts) {
+                    $this.loadJS(js).then(() => tot--)
+                }
+
+                //await $this.loadCSS(Object.keys($this.styles), Object.values($this.styles))
+
+                await waitFor(() => tot == 0)
+
+                if (!$this.boolEval('Theme')) {
+                    logError('Syntax error on theme. Check developer console')
+                    await $this.kernel.showWindow()
+                    window.initialWindowAppeared = true
+                    return
+                }
 
                 const thememanifest = await $this.loadJSON((await $this.kernel.getThemeUrl('manifest.json')))
 
-                if (await $this.kernel.existsThemeFile('theme.js')) {
-                    $this.theme.isLoaded = false
-                    log('Wait for theme is loaded...')
-                    await $this.loadJS((await $this.kernel.getThemeUrl('theme.js')))
-                    await waitFor(() => $this.theme.isLoaded)
-                }
-
-                log('Initialize theme...')
-
-                await $this.theme.init(thememanifest)
+                $this.theme = await Theme.create(thememanifest)
 
                 await $this.theme.updateTitle()
 
-                await $this.theme.beginAppear()
+                await $this.theme.onBeforeInitialShow()
+
+                await $this.theme.onBeginViewShow();
 
                 await $this.kernel.showWindow()
+
+                window.initialWindowAppeared = true
 
                 await $this.theme.appear()
 
@@ -422,12 +448,12 @@ let core = {};
                 $this.kernel.criticalError(err)
             }
         },
-        updateClientWindowSize: function() {
+        updateClientWindowSize: () => {
             const win = {
                 h: $(window).height(),
                 w: $(window).width(),
             };
-            $('.scalable').each(function() {
+            $('.scalable').each(() => {
                 const doc = {
                     h: $(this).height(),
                     w: $(this).width(),
@@ -447,7 +473,7 @@ let core = {};
                 control = document;
                 wffe = true;
             }
-            const fun = function() {
+            const fun = () => {
                 if ($(control).tooltip('instance')) {
                     $(control).tooltip('destroy');
                 }
@@ -455,7 +481,7 @@ let core = {};
                     show: { effect: 'none', duration: 1 },
                     hide: { effect: 'none', duration: 1 },
                     items: '[title], [data-tooltip]',
-                    content: function() {
+                    content: () => {
                         if ($(this).attr('data-tooltip')) {
                             return $(this).attr('data-tooltip');
                         }
@@ -487,7 +513,7 @@ let core = {};
                     duration = 3000;
                 }
                 msg.css('animation-duration', duration + 'ms');
-                setTimeout(function() {
+                setTimeout(() => {
                     msg.remove();
                     resolve()
                 }, duration);
@@ -495,9 +521,9 @@ let core = {};
         },
         lastView: undefined,
         showView: function(name, cb) {
-            const cont = function() {
+            const cont = () => {
                 $this.lastView = name;
-                $this.showTemplate(name, function() {
+                $this.showTemplate(name, () => {
                     $('html, body').removeClass('prevent-user-interactions');
 
                     if ($this.views[name].enablebackgroundMoveOnMouse) {
@@ -517,88 +543,13 @@ let core = {};
         },
         loadedTemplates: {},
         media: {},
-        preloadAll: function() {
-            const images = [];
-            let tot = 0;
-            $.each(this.templates, function(idx, key) {
-                $this.scripts['templates/' + key + '.js'] = '';
-                $this.styles['templates/' + key + '.css'] = key + '_loaded';
-                $this.loadedTemplates[key] = $('<div></div>');
-                $this.loadedTemplates[key].load($this.versionUrl('templates/' + key + '.html'),
-                    function() {
-                        tot++;
-                    });
-            });
-
-            $.each(this.scripts, function(key, val) {
-                $this.loadJS([key], function() {
-                    tot++;
-                }, [val]);
-            });
-
-            $.each(this.styles, function(key, val) {
-                $this.loadCSS([key], function() {
-                    tot++;
-                }, [val]);
-            });
-
-            waitFor(function() {
-                return core.media.images;
-            }, function() {
-                $.each(core.media.images, function(idx, key) {
-                    images.push(key);
-                });
-            });
-
-            $.each(images, function(idx, key) {
-                $this.loadImages([key]).then(function() {
-                    tot++;
-                });
-            });
-
-            waitFor(function() {
-                //
-                const ret = core.loadedjs.langs;/* && core.audio */
-
-                // log("re: " + ret);
-                return ret;
-            }, function() {
-                // log(grandtotal + "," + tot);
-
-                $.each($this.loadedTemplates, function(idx, key) {
-
-                });
-
-                tot += 2;
-                // log(grandtotal + "," + tot);
-            });
-
-            const grandtotal = Object.keys(this.scripts).length + Object.keys(this.styles).length + this.templates.length + images.length +
-                1 + // languages
-                1; // audio
-
-
-            return new Promise(function(resolve, reject) {
-                let pre = -1;
-                waitFor(function() {
-                    const per = tot / grandtotal;
-                    if (pre != per) {
-                        pre = per;
-                        // log("loading...: " + tot + " / " + grandtotal);
-                    }
-                    return tot >= grandtotal;
-                }, function() {
-                    resolve();
-                });
-            });
-        },
         parseControl: function(control) {
             let changed = false;
             $(control)
                 .contents()
-                .filter(function() {
+                .filter(() => {
                     return this.nodeType === 3; // Node.TEXT_NODE
-                }).each(function() {
+                }).each(() => {
                     const original = $(this).text();
                     const text = $this.parseText(original);
 
@@ -612,7 +563,7 @@ let core = {};
                         changed = true;
                     }
                 });
-            $.each(control.get(0).attributes, function() {
+            $.each(control.get(0).attributes, () => {
                 // this.attributes is not a plain object, but an array
                 // of attribute nodes, which contain both the name and value
                 if (this.specified) {
@@ -633,9 +584,16 @@ let core = {};
             }
 
             const children = $(control).children();
-            children.each(function() {
+            children.each(() => {
                 $this.parseControl($(this));
             });
+        },
+        boolEval: function(text) {
+            try {
+                return eval(text) ? true : false
+            } catch (err) {
+                return false;
+            }
         },
         parseText: function(original) {
             let html = original;
@@ -749,30 +707,30 @@ let core = {};
             return html;
         },
         elementFuns: {
-            click: function() {
+            click: () => {
                 core.audio.play('btn_click');
             },
-            hover: function() {
+            hover: () => {
                 core.audio.play('btn_over');
             },
-            apply: function() {
+            apply: () => {
                 core.audio.play('btn_apply');
             },
-            clicksnd: function() {
+            clicksnd: () => {
                 core.audio.play($(this).attr('data-snd-onclick'));
             },
-            hoversnd: function() {
+            hoversnd: () => {
                 core.audio.play($(this).attr('data-snd-onover'));
                 $(this).addClass('hovered');
             },
-            hovered: function() {
+            hovered: () => {
                 $(this).addClass('hovered');
             },
         },
         onNewElementAdded: function(object) {
             $this.parseControl(object);
 
-            const fun = function() {
+            const fun = () => {
                 $(this).attr('data-tooltip', $(this).attr('title'));
                 $(this).removeAttr('title');
             };
@@ -838,11 +796,11 @@ let core = {};
             //tplcont.object.hide();
             //tplcont.object.css('opacity', 1);
 
-            const cont = function() {
+            const cont = () => {
 
                 tplcont.object.animate({
                     opacity: 1
-                }, function() {
+                }, () => {
                     if ($this.views[key].showDone) {
                         $this.views[key].showDone(cont);
                     }
@@ -870,20 +828,20 @@ let core = {};
             log('enableInteractions from', !prev, enable)
             return !prev
         },
-        exit: function() {
+        exit: () => {
             // test if desktop object exists
             if (window.CBKernel) {
-                setTimeout(function() {
+                setTimeout(() => {
                     window.CBKernel.applicationExit();
                 }, 10);
             } else {
-                setTimeout(function() {
+                setTimeout(() => {
                     alert('u can close bworser!');
                     // self.close();
                 }, 10);
             }
         },
-        showOptions: function() {
+        showOptions: () => {
             $this.showWindowByTemplate('main_options', true);
         },
         showMessage: function(severity, msgid, oncreate, onclose) {
@@ -903,7 +861,7 @@ let core = {};
         },
         dialogs: {},
         openedDialogs: {},
-        closeAllDialogs: function() {
+        closeAllDialogs: () => {
             $.each(this.openedDialogs, function(uid, dialog) {
                 $this.closeDialog(dialog.control.object);
             });
@@ -943,12 +901,12 @@ let core = {};
 
             if (info.modal) {
                 info.maincont.addClass('disable-interaction');
-                info.maincont.fadeOut(function() {
+                info.maincont.fadeOut(() => {
                     finaldel(this);
                 });
             } else {
                 dialog.addClass('disable-interaction');
-                dialog.fadeOut(function() {
+                dialog.fadeOut(() => {
                     finaldel(this);
                 });
             }
@@ -993,11 +951,11 @@ let core = {};
 
             core.onNewElementAdded(dialog.object);
 
-            dialog.object.find('.dialog-closebtn').click(function() {
+            dialog.object.find('.dialog-closebtn').click(() => {
                 $this.closeDialog(dialog.object);
             });
 
-            dialog.object.find('.dialog-buttons .button').click(function() {
+            dialog.object.find('.dialog-buttons .button').click(() => {
                 if (core.dialogs[key].click) {
                     if (!core.dialogs[key].click($(this))) {
                         return;
@@ -1008,7 +966,7 @@ let core = {};
                 }
             });
 
-            const endfun = function() {
+            const endfun = () => {
                 dialog.object.removeClass('disable-interaction');
                 if (core.dialogs[key].showDone) {
                     core.dialogs[key].showDone(dialog.object);
@@ -1021,7 +979,7 @@ let core = {};
                     const olopacity = maincont.css('opacity');
                     maincont.css('opacity', 0);
                     maincont.show();
-                    core.dialogs[key].showBegin(dialog.object, function() {
+                    core.dialogs[key].showBegin(dialog.object, () => {
                         maincont.hide();
                         maincont.css('opacity', olopacity);
                         maincont.fadeIn(endfun);
@@ -1033,7 +991,7 @@ let core = {};
                 dialog.object.css('opacity', 0);
                 dialog.show();
                 if (core.dialogs[key].showBegin) {
-                    core.dialogs[key].showBegin(dialog.object, function() {
+                    core.dialogs[key].showBegin(dialog.object, () => {
                         dialog.hide();
                         dialog.object.css('opacity', 1);
 
@@ -1047,9 +1005,9 @@ let core = {};
                 }
             }
         },
-        testTooltip: function() {
+        testTooltip: () => {
             $('[title]').first().tooltip({
-                content: function() {
+                content: () => {
                     return $(this).prop('title');
                 },
                 offset: [0, 100],
@@ -1068,7 +1026,7 @@ let core = {};
             }
             return uid;
         },
-        loadConfiguration: async function() {
+        loadConfiguration: async () => {
             const config = await $this.loadData('config');
 
             if (!config) {
@@ -1085,7 +1043,7 @@ let core = {};
 
             core.audio.updateVolumes();
         },
-        saveConfiguration: function() {
+        saveConfiguration: () => {
             const config = {
                 volumes: {},
             };
@@ -1102,7 +1060,7 @@ let core = {};
                 if (window.CBKernel) {
                     window.CBKernel.storeData(filename, JSON.stringify(data)).then(resolve)
                 } else {
-                    setTimeout(function() {
+                    setTimeout(() => {
                         localStorage.setItem('DAS-' + filename, JSON.stringify(data))
                         resolve()
                     }, 10)
@@ -1147,13 +1105,13 @@ let core = {};
 
             core.audio.fadeOutAll(400);
 
-            $this.views[$this.lastView].content.fadeOut(function() {
+            $this.views[$this.lastView].content.fadeOut(() => {
                 if ($this._backgroundMoveOnMouse_timer) {
                     clearInterval($this._backgroundMoveOnMouse_timer);
                 }
                 $this._backgroundMoveOnMouse_timer = 0;
 
-                const cont = function() {
+                const cont = () => {
                     $this.views[$this.lastView].content.remove();
 
                     if (cb) {
@@ -1187,7 +1145,7 @@ let core = {};
             const bkg = content.find('.background');
             $this._backgroundMoveOnMouse_actScale = 1;
 
-            this._backgroundMoveOnMouse_timer = setInterval(function() {
+            this._backgroundMoveOnMouse_timer = setInterval(() => {
                 if ($this._backgroundMoveOnMouse_actScale < 1.05) {
                     $this._backgroundMoveOnMouse_actScale += 0.001;
                 }
@@ -1328,7 +1286,8 @@ let core = {};
             return parent
         }
     };
-    const $this = core;
+    window.initialWindowAppeared = false
+    window.core = $this;
     const log = function() {
         const margs = Array.from(arguments)
         margs.unshift('Core')
@@ -1339,236 +1298,234 @@ let core = {};
         margs.unshift('Core')
         $this.logError.apply($this, margs)
     }
-})();
-
-function shuffle(array) {
-    let currentIndex = array.length; let temporaryValue; let randomIndex;
-
-    // While there remain elements to shuffle...
-    while (currentIndex !== 0) {
-        // Pick a remaining element...
-        randomIndex = Math.floor($this.random() * currentIndex);
-        currentIndex -= 1;
-
-        // And swap it with the current element.
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
-    }
-
-    return array;
-}
-
-function padLeft(str, count, mchar) {
-    str = '' + str;
-    if (str.length >= count) {
-        return str;
-    }
-    const pad = Array(count + 1).join(mchar);
-
-    return pad.substring(0, pad.length - str.length) + str;
-}
-
-function formatTime(ticks, removeseconds) {
-    ticks = ticks / 1000;
-    const days = Math.floor(ticks / 86400);
-    // After deducting the days calculate the number of hours left
-    const hours = Math.floor((ticks - (days * 86400)) / 3600);
-    // After days and hours , how many minutes are left
-    const minutes = Math.floor((ticks - (days * 86400) - (hours * 3600)) / 60);
-    // Finally how many seconds left after removing days, hours and minutes.
-    const secs = Math.floor((ticks - (days * 86400) - (hours * 3600) - (minutes * 60)));
-
-    let ret = '';
-    if (days > 0) {
-        ret += days + '.';
-    }
-
-    return ret += padLeft('' + hours, 2, '0') + ':' + padLeft('' + minutes, 2, '0') + (!removeseconds ? (':' + padLeft('' + secs, 2, '0')) : '');
-}
-
-function isFunction(functionToCheck, onlyasync) {
-    const getType = {};
-    return functionToCheck && [onlyasync ? '[fakeme]' : '[object Function]', '[object AsyncFunction]'].indexOf(getType.toString.call(functionToCheck)) > -1;
-}
-
-if (!String.prototype.replaceAll) {
-    // eslint-disable-next-line no-extend-native
-    String.prototype.replaceAll = function(token, newToken, ignoreCase) {
-        let str; let i = -1; let _token;
-        if (newToken == undefined) {
-            newToken = '';
+    // eslint-disable-next-line camelcase
+    window.waitFor = async (stringVariable_orCallback) => {
+        if (typeof stringVariable_orCallback == "string" && stringVariable_orCallback.length == 0) {
+            const err = new Error("Empty stringVariable_orCallback passed.")
+            logError(err)
+            throw err;
         }
-        if ((str = this.toString()) && typeof token === 'string') {
-            _token = ignoreCase === true ? token.toLowerCase() : undefined;
-            while ((i = (
-                _token !== undefined
-                    ? str.toLowerCase().indexOf(
-                        _token,
-                        i >= 0 ? i + newToken.length : 0
-                    ) : str.indexOf(
-                        token,
-                        i >= 0 ? i + newToken.length : 0
-                    )
-            )) !== -1) {
-                str = str.substring(0, i)
-                    .concat(newToken)
-                    .concat(str.substring(i + token.length));
-            }
-        }
-        return str;
-    };
-}
-
-window.getTickCount_initial = 0;
-function getTickCount() {
-    if (!window.getTickCount_initial)
-        window.getTickCount_initial = new Date().getTime() - Math.floor(performance.now());
-    return Math.floor(performance.now()) + window.getTickCount_initial;
-}
-
-const waitForFinalEvent = (function() {
-    const timers = {};
-    return function(callback, ms, uniqueId) {
-        if (!uniqueId) {
-            uniqueId = 'Don\'t call this twice without a uniqueId';
-        }
-        if (timers[uniqueId]) {
-            clearTimeout(timers[uniqueId]);
-            delete timers[uniqueId];
-        }
-        timers[uniqueId] = setTimeout(callback, ms);
-    };
-})();
-
-function getQuerystring(key, default_, source) {
-    if (!source) {
-        source = document.location.href;
-    }
-    if (source.indexOf('?') == -1) {
-        source = '?' + source;
-    }
-    // debugLog("getQuerystring from " + source);
-    // if (default_==null) default_="";
-    key = key.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
-    const regex = new RegExp('[\\?&]' + key + '=([^&#]*)');
-    const qs = regex.exec(source);
-    if (qs == null) {
-        // debugLog("Null returned!");
-        return default_;
-    } else {
-        return qs[1];
-    }
-}
-
-const getScreenCoordOf = function(control) {
-    let e = $(control).get()[0];
-    const offset = { x: 0, y: 0 };
-    while (e) {
-        offset.x += e.offsetLeft;
-        offset.y += e.offsetTop;
-        e = e.offsetParent;
-    }
-    return offset;
-};
-
-// eslint-disable-next-line camelcase
-const waitFor = async function(stringVariable_orCallback, callback, deftimeout) {
-    callback = callback || function() { }
-    return new Promise(resolve => {
-        if (!deftimeout) {
-            deftimeout = 1;
-        }
-        // eslint-disable-next-line camelcase
-        if (typeof stringVariable_orCallback === 'string') {
-            const totvars = stringVariable_orCallback.split(',');
-            for (let i = 0; i < totvars.length; i++) {
-                try {
-                    const ev = eval(totvars[i]);
-                    if (!ev) {
-                        setTimeout(function() {
-                            waitFor(stringVariable_orCallback, callback);
-                        }, deftimeout);
-                        return;
+        const pErr = new Error('Timeout ' + $this.options.initialWindowAppearTimeout + ' appstart in waitFor. ' + stringVariable_orCallback)
+        return new Promise(resolve => {
+            const deftimeout = 1;
+            let timer
+            timer = setInterval(() => {
+                if (getPassedTick() > $this.options.initialWindowAppearTimeout && !window.initialWindowAppeared) {
+                    log('#### Initial window is not appear for 5 seconds.')
+                    log(' Process is waiting for:', stringVariable_orCallback)
+                    logError(pErr)
+                    clearInterval(timer)
+                    return;
+                }
+                let allok = false
+                // eslint-disable-next-line camelcase            
+                if (typeof stringVariable_orCallback === 'string') {
+                    const totvars = stringVariable_orCallback.split(',');
+                    allok = true
+                    for (let i = 0; i < totvars.length; i++) {
+                        try {
+                            const ev = eval(totvars[i]);
+                            allok = ev ? true : false
+                            if (!allok) {
+                                allok = false
+                                break
+                            }
+                        } catch (Err) {
+                            logError(Err + '. ' + pErr.stack)
+                            clearInterval(timer)
+                            return
+                        }
                     }
-                } catch (Err) {
-                    core.logError("Core", new Error(`Error while eval: "${totvars[i]}"`))
-                    throw Err
+                } else {
+                    try {
+                        allok = stringVariable_orCallback()
+                    } catch (Err) {
+                        allok = false
+                        logError(Err + '. ' + pErr.stack)
+                        clearInterval(timer)
+                        return
+                    }
+                }
+                if (allok) {
+                    resolve()
+                    clearInterval(timer)
+                    return;
+                }
+            }, deftimeout)
+        })
+    };
+
+
+    if (!Array.prototype.shuffle) {
+        // eslint-disable-next-line no-extend-native
+        Array.prototype.shuffle = function() {
+            const array = this
+            let currentIndex = array.length; let temporaryValue; let randomIndex;
+
+            // While there remain elements to shuffle...
+            while (currentIndex !== 0) {
+                // Pick a remaining element...
+                randomIndex = Math.floor($this.random() * currentIndex);
+                currentIndex -= 1;
+
+                // And swap it with the current element.
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+
+            return array;
+        }
+    }
+
+    window.formatTime = (ticks, removeseconds) => {
+        ticks = ticks / 1000;
+        const days = Math.floor(ticks / 86400);
+        // After deducting the days calculate the number of hours left
+        const hours = Math.floor((ticks - (days * 86400)) / 3600);
+        // After days and hours , how many minutes are left
+        const minutes = Math.floor((ticks - (days * 86400) - (hours * 3600)) / 60);
+        // Finally how many seconds left after removing days, hours and minutes.
+        const secs = Math.floor((ticks - (days * 86400) - (hours * 3600) - (minutes * 60)));
+
+        let ret = '';
+        if (days > 0) {
+            ret += days + '.';
+        }
+
+        return ret += ('' + hours).padStart(2, '0') + ':' + ('' + minutes).padStart(2, '0') + (!removeseconds ? (':' + ('' + secs).padStart(2, '0')) : '');
+    }
+
+    window.isFunction = (functionToCheck, onlyasync) => {
+        const getType = {};
+        return functionToCheck && [onlyasync ? '[fakeme]' : '[object Function]', '[object AsyncFunction]'].indexOf(getType.toString.call(functionToCheck)) > -1;
+    }
+
+    if (!String.prototype.replaceAll) {
+        // eslint-disable-next-line no-extend-native
+        String.prototype.replaceAll = function(token, newToken, ignoreCase) {
+            let str; let i = -1; let _token;
+            if (newToken == undefined) {
+                newToken = '';
+            }
+            if ((str = this.toString()) && typeof token === 'string') {
+                _token = ignoreCase === true ? token.toLowerCase() : undefined;
+                while ((i = (
+                    _token !== undefined
+                        ? str.toLowerCase().indexOf(
+                            _token,
+                            i >= 0 ? i + newToken.length : 0
+                        ) : str.indexOf(
+                            token,
+                            i >= 0 ? i + newToken.length : 0
+                        )
+                )) !== -1) {
+                    str = str.substring(0, i)
+                        .concat(newToken)
+                        .concat(str.substring(i + token.length));
                 }
             }
-            callback();
-            resolve();
-        } else {
-            if (!stringVariable_orCallback()) {
-                setTimeout(function() {
-                    waitFor(stringVariable_orCallback, callback);
-                }, deftimeout);
-                return;
+            return str;
+        };
+    }
+
+    window.getTickCount_initial = 0;
+    window.getTickCount = () => {
+        if (!window.getTickCount_initial)
+            window.getTickCount_initial = new Date().getTime() - Math.floor(performance.now());
+        return Math.floor(performance.now()) + window.getTickCount_initial;
+    }
+    window.getPassedTick = () => {
+        return getTickCount() - getTickCount_initial;
+    }
+
+    window.waitForFinalEvent = (() => {
+        const timers = {};
+        return function(callback, ms, uniqueId) {
+            if (!uniqueId) {
+                uniqueId = 'Don\'t call this twice without a uniqueId';
             }
-            callback();
-            resolve();
+            if (timers[uniqueId]) {
+                clearTimeout(timers[uniqueId]);
+                delete timers[uniqueId];
+            }
+            timers[uniqueId] = setTimeout(callback, ms);
+        };
+    })();
+
+    window.getQuerystring = (key, default_, source) => {
+        if (!source) {
+            source = document.location.href;
         }
-    })
-};
-
-const pWaitFor = async function(stringVariable_orCallback) {
-    return await new Promise(resolve => {
-
-        waitFor(stringVariable_orCallback, function() {
-            resolve();
-        })
-
-    })
-}
-
-const pWaitTime = async function(delay) {
-    return new Promise(resolve => {
-        setTimeout(resolve, delay)
-    })
-}
-
-
-if (!String.format) {
-    String.format = function(format, firstarg) {
-        // eslint-disable-next-line prefer-rest-params
-        let args = Array.prototype.slice.call(arguments, 1);
-        if (firstarg != undefined && Array.isArray(firstarg)) {
-            args = firstarg;
+        if (source.indexOf('?') == -1) {
+            source = '?' + source;
         }
-        return format.replace(/{(\d+)}/g, function(match, number) {
-            return typeof args[number] !== 'undefined'
-                ? args[number]
-                : match;
-        });
+        // debugLog("getQuerystring from " + source);
+        // if (default_==null) default_="";
+        key = key.replace(/[[]/, '\\[').replace(/[\]]/, '\\]');
+        const regex = new RegExp('[\\?&]' + key + '=([^&#]*)');
+        const qs = regex.exec(source);
+        if (qs == null) {
+            // debugLog("Null returned!");
+            return default_;
+        } else {
+            return qs[1];
+        }
+    }
+
+    window.getScreenCoordOf = (control) => {
+        let e = $(control).get()[0];
+        const offset = { x: 0, y: 0 };
+        while (e) {
+            offset.x += e.offsetLeft;
+            offset.y += e.offsetTop;
+            e = e.offsetParent;
+        }
+        return offset;
     };
-};
 
-(function() {
 
-    const trim = function(source, chars) {
-        if (!chars || chars.length == 0) {
-            return defaultTrim.apply(source)
+    if (!String.format) {
+        String.format = function(format, firstarg) {
+            // eslint-disable-next-line prefer-rest-params
+            let args = Array.prototype.slice.call(arguments, 1);
+            if (firstarg != undefined && Array.isArray(firstarg)) {
+                args = firstarg;
+            }
+            return format.replace(/{(\d+)}/g, function(match, number) {
+                return typeof args[number] !== 'undefined'
+                    ? args[number]
+                    : match;
+            });
+        };
+    };
+
+    (() => {
+
+        const trim = function(source, chars) {
+            if (!chars || chars.length == 0) {
+                return defaultTrim.apply(source)
+            }
+            if (!Array.isArray(chars)) {
+                chars = [chars]
+            }
+            for (let c of chars) {
+                if (c === "]") c = "\\]";
+                if (c === "\\") c = "\\\\";
+                source = source.replace(new RegExp(
+                    "^[" + c + "]+|[" + c + "]+$", "g"
+                ), "");
+            }
+            return source
         }
-        if (!Array.isArray(chars)) {
-            chars = [chars]
+        const defaultTrim = String.prototype.trim
+        String.prototype.trim = function(chars) {
+            return trim(this, chars)
         }
-        for (let c of chars) {
-            if (c === "]") c = "\\]";
-            if (c === "\\") c = "\\\\";
-            source = source.replace(new RegExp(
-                "^[" + c + "]+|[" + c + "]+$", "g"
-            ), "");
-        }
-        return source
-    }
-    const defaultTrim = String.prototype.trim
-    String.prototype.trim = function(chars) {
-        return trim(this, chars)
-    }
 
-})()
+    })()
 
 
-waitFor('window.$, window.kernel', function() {
+    await waitFor('window.$, window.kernel')
     core.init()
-});
+})();
