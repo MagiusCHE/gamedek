@@ -1,4 +1,4 @@
-html, body, .gd-viewscontainer {
+html, body, #gd-viewscontainer {
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -8,39 +8,92 @@ html, body, .gd-viewscontainer {
 
 body.gd-body{
     font-family: 'Exo 2', sans-serif ;
-    font-weight: 200;
+    font-weight: 300;
+    color: #d9d9d9;
 }
 
-.gd-viewscontainer {
+#gd-viewscontainer {
     top:0px;
     left:0px;
     position: absolute;
 }
-.gd-view{
+#gd-view{
     top:0px;
     left:0px;
     position: absolute;
     width: 100%;
     height: 100%;
-    background-color: rgb(42, 42, 42);
-    color:#c5c5c5;
-
+    /*background-color: rgb(42, 42, 42);*/
+    background-color: black;
+    z-index:0;
 }
 
-.gd-view > .background {
+body.loading #gd-view
+, body.loading #gd-header{
+    pointer-events: none;
+}
+
+#view-background {
     z-index:0;
     width: 100%;
     height: 100%;
     top:0px;
     left:0px;
-    position: absolute;
+    position: absolute;   
+    opacity: 0.5;
+    background-image: url('media/global_back.jpg');
+    background-size: cover; 
 }
 
-.gd-view > .app-view{
+#gd-view > #app-view{
     top:0px;
     left:0px;
     position: absolute;
     z-index: 1;
+    padding-top:2rem;
+    padding-left:0.5rem;
+    padding-right:0.5rem;
+}
+
+#great-loader {
+    position: fixed;
+    left:50%;
+    top: 30%;
+}
+
+#great-loader .message {
+    position: relative;
+    display: inline-block;
+    margin-left:-50%;
+    margin-top:-50%;
+    border: 2px solid #4d7c8d;
+    border-bottom-color: #97c2d1;
+    background-color: #000000a6;
+    padding: 1rem;
+}
+
+#gd-header{
+    position: absolute;
+    z-index: 1;
+    font-size: 1.7rem;
+    padding-left:0.5rem;
+}
+
+#gd-header .icon{
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+#gd-header .icon:hover{
+    opacity: 1;
+}
+
+[data-gd-view="home"] #gd-header .icon[data-view="home"]{
+    opacity: 1;
+}
+
+[data-gd-view="settings"] #gd-header .icon[data-view="settings"]{
+    opacity: 1;
 }
 
 #csscontroller #main_loaded {

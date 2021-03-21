@@ -1,0 +1,11 @@
+{
+    "name": "it.magius.gamedek.plugin.locale",
+    "version": "1.0.0",
+    "author": {
+        "name": "Magius(CHE)",
+        "email": "magiusche@magius.it"
+    },
+    "repo": "https://github.com/MagiusCHE/gamedek-puglins-localization.git",
+    "provides": "localization",
+    "fallback": "en"
+}

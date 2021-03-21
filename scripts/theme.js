@@ -4,9 +4,10 @@ class Theme {
 
         if (await core.kernel.existsThemeFile('theme.js')) {
             await core.loadJS((await core.kernel.getThemeUrl('theme.js')))
-            console.log('Wait for', 'Theme_' + manifest.name)
-            await waitFor(() => core.boolEval('Theme_' + manifest.name))
-            classname = eval('Theme_' + manifest.name)
+            const simpleName = manifest.simpleName || manifest.name.split('.').pop()
+            //console.log(`Waiting for "${manifest.name}" >> "Theme_${simpleName}"...`)
+            await waitFor(() => core.boolEval('Theme_' + simpleName))
+            classname = eval('Theme_' + simpleName)
         }
 
         const theme = new classname(manifest)
@@ -20,6 +21,7 @@ class Theme {
     constructor(manifest) {
         this.manifest = manifest
     }
+    #locale = undefined
     async init() {
         const jss = []
         const csss = []
@@ -27,72 +29,105 @@ class Theme {
         const towaitfor = []
         const images = []
         const htmls = {}
-        for (const tpl of this.manifest.views) {
-            const page = 'views/' + tpl
-            const js = await this.themeUrl(page + '.js')
-            if (js) {
-                jss.push(js)
-                towaitfor.push('ThemeView_' + tpl)
-            }
-            const css = await this.themeUrl(page + '.css')
-            if (css) {
-                csss.push(css)
-                csss_ctrl.push(tpl + '_loaded')
-            }
-            const html = await this.themeUrl(page + '.html')
-            htmls[tpl] = html
-        }
-        for (const script of this.manifest.scripts) {
-            if (script.endsWith('/*')) {
-                const newpath = script.split('/')
-                newpath.pop()
-                const all = await this.themeUrls(newpath.join('/'))
-                for (const js of all) {
+        if (this.manifest.views) {
+            for (const tpl of this.manifest.views) {
+                const page = 'views/' + tpl
+                const js = await this.themeUrl(page + '.js')
+                if (js) {
                     jss.push(js)
+                    towaitfor.push('ThemeView_' + tpl)
                 }
-            } else {
-                const js = await this.themeUrl(script)
-                if (!js) {
-                    this.logError('Missing js ', script)
+                const css = await this.themeUrl(page + '.css')
+                if (css) {
+                    csss.push(css)
+                    csss_ctrl.push(tpl + '_loaded')
+                }
+                const html = await this.themeUrl(page + '.html')
+                htmls[tpl] = html
+            }
+        }
+        if (this.manifest.templates) {
+            for (const tpl of this.manifest.templates) {
+                if (tpl.endsWith('/*')) {
+                    const newpath = tpl.split('/')
+                    newpath.pop()
+                    const all = await this.themeUrls(newpath.join('/'))
+                    for (const html of all) {
+                        const tname = html.split('/').pop().split('.')
+                        tname.pop()
+                        if (!html) {
+                            throw new Error(`Cannot load "${html}"`)
+                        }
+                        htmls[tname.join('.')] = html
+                    }
                 } else {
-                    jss.push(js)
+                    const tname = tpl.split('/').pop().split('.')
+                    tname.pop()
+                    const html = await this.themeUrl(tpl)
+                    if (!html) {
+                        throw new Error(`Cannot load "${tpl}"`)
+                    }
+                    htmls[tname.join('.')] = html
                 }
             }
         }
-        for (const style in this.manifest.styles) {
+        if (this.manifest.scripts) {
+            for (const script of this.manifest.scripts) {
+                if (script.endsWith('/*')) {
+                    const newpath = script.split('/')
+                    newpath.pop()
+                    const all = await this.themeUrls(newpath.join('/'))
+                    for (const js of all) {
+                        jss.push(js)
+                    }
+                } else {
+                    const js = await this.themeUrl(script)
+                    if (!js) {
+                        this.logError('Missing js ', script)
+                    } else {
+                        jss.push(js)
+                    }
+                }
+            }
+        }
+        if (this.manifest.styles) {
+            for (const style in this.manifest.styles) {
 
-            if (style.endsWith('/*')) {
-                const newpath = style.split('/')
-                newpath.pop()
-                const all = await this.themeUrls(newpath.join('/'))
-                for (const js of all) {
-                    csss.push(js)
-                    csss_ctrl.push(this.manifest.styles[style])
-                }
-            } else {
-                const js = await this.themeUrl(style)
-                if (!js) {
-                    this.logError('Missing css ', style)
+                if (style.endsWith('/*')) {
+                    const newpath = style.split('/')
+                    newpath.pop()
+                    const all = await this.themeUrls(newpath.join('/'))
+                    for (const js of all) {
+                        csss.push(js)
+                        csss_ctrl.push(this.manifest.styles[style])
+                    }
                 } else {
-                    csss.push(js)
-                    csss_ctrl.push(this.manifest.styles[style])
+                    const js = await this.themeUrl(style)
+                    if (!js) {
+                        this.logError('Missing css ', style)
+                    } else {
+                        csss.push(js)
+                        csss_ctrl.push(this.manifest.styles[style])
+                    }
                 }
             }
         }
-        for (const image of this.manifest.images) {
-            if (image.endsWith('/*')) {
-                const newpath = image.split('/')
-                newpath.pop()
-                const allimgs = await this.themeUrls(newpath.join('/'))
-                for (const img of allimgs) {
-                    images.push(img)
-                }
-            } else {
-                const imgpath = await this.themeUrl(image)
-                if (!imgpath) {
-                    this.logError('Missing image', image)
+        if (this.manifest.images) {
+            for (const image of this.manifest.images) {
+                if (image.endsWith('/*')) {
+                    const newpath = image.split('/')
+                    newpath.pop()
+                    const allimgs = await this.themeUrls(newpath.join('/'))
+                    for (const img of allimgs) {
+                        images.push(img)
+                    }
                 } else {
-                    images.push(imgpath)
+                    const imgpath = await this.themeUrl(image)
+                    if (!imgpath) {
+                        this.logError('Missing image', image)
+                    } else {
+                        images.push(imgpath)
+                    }
                 }
             }
         }
@@ -100,6 +135,7 @@ class Theme {
             + (images.length > 0 ? 1 : 0)
             + (csss.length > 0 ? 1 : 0)
             + (jss.length > 0 ? 1 : 0)
+            + (towaitfor.length > 0 ? 1 : 0)
         //css,js,images,html
 
         this.log('Load theme blocks:', blockstoload)
@@ -130,7 +166,9 @@ class Theme {
             core.loadCSS(csss, csss_ctrl).then(() => blockstoload--)
         }
         if (jss.length > 0) {
-            core.loadJS(jss)
+            core.loadJS(jss).then(() => blockstoload--)
+        }
+        if (towaitfor.length > 0) {
             waitFor(() => {
                 let passed = true
                 for (const t of towaitfor) {
@@ -163,40 +201,60 @@ class Theme {
     }
     async onBeforeInitialShow() {
         //first appear need to do something?
-        const cont = $('<div class="gd-viewscontainer"></div>')
+        const cont = $('<div id="gd-viewscontainer"></div>')
         $('body').append(cont)
     }
     #views = {}
     async onBeginViewShow() {
-        //render actual view
-        $('body .gd-viewscontainer .gd-view').remove()
+        //render actual view        
+        await this.prepareCurrentView()
+    }
+    async resetView(id) {
+        this.#views[id] = $(`<div id="gd-view" data-gd-view="${id}">` + (await this.translateBlock(await this.getTemplate(id))) + '</div>')
+    }
+    async translateBlock(text) {
+        return await core.kernel.provider('localization', `translateBlock`, text, "poppo")
+    }
+    async getTemplate(id) {
+        if (!this.#htmlpieces[id]) {
+            throw new Error(`Missing template with name "${id}".`)
+        }
+        return this.#htmlpieces[id].html()
+    }
+    async onThemeAppeared() {
+        await this.appearCurrentView()
+        await this.appearedCurrentView()
+        await core.kernel.fireOnGuiAppeared()
+    }
+    async changeView(pageid) {
+        if (this.#visbilePageId == pageid) {
+            return
+        }
+        await this.hideCurrentView()
+        await this.setPage(pageid)
+
+        await this.prepareCurrentView()
+        await this.appearCurrentView()
+        await this.appearedCurrentView()
+    }
+    async hideCurrentView() {
+
+    }
+    async prepareCurrentView() {
+        $('body #gd-viewscontainer #gd-view').remove()
 
         if (!this.#views[this.#visbilePageId]) {
             await this.resetView(this.#visbilePageId)
         }
         const view = this.#views[this.#visbilePageId]
-        $('body .gd-viewscontainer').append(view)
+        $('body #gd-viewscontainer').append(view)
+        $('html').attr('data-gd-view', this.#visbilePageId)
     }
-    async resetView(id) {
-        this.log('Htmlpieces', this.#htmlpieces)
-        this.#views[id] = $(`<div class="gd-view" data-gd-view="${id}">` + (await this.translateText(this.#htmlpieces[id].html())) + '</div>')
+    async appearCurrentView() {
+
     }
-    async translateText(text) {
-        this.log('TODO: translate stub.')
-        return text
-    }
-    async appear() {
-        /*back.fadeIn().then(function() {
-            core.showLoader();
-            core.preloadAll().then(function() {
-                core.hideLoader();
-                core.loadConfiguration();
-                core.showView('home', function() {
-                    back.setBackground(); // clear background
-                    this.enableTooltip();
-                });
-            });
-        });*/
+    async appearedCurrentView() {
+
     }
     #visbilePageId = undefined
     async setPage(pageid) {

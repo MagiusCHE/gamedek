@@ -1,4 +1,11 @@
 {
+    "theme": "default",
+    "plugins": {
+        "gamelib.local": false,
+        "gamelib.lutris": true,
+        "gamelib.manager": true,
+        "localization": true
+    },
     "log": {
         "namespaceFormat": "{%s}",
         "trace": true,
@@ -9,7 +16,8 @@
         "loadcss": true
     },
     "debug": {
-        "version": true
+        "version": true,
+        "immediateshow": true
     },
     "initialWindowAppearTimeout": 5000
 }

@@ -1,11 +1,11 @@
 {
-    "name": "default",
+    "name": "it.magius.gamedek.theme.default",
     "version": "1.0.0",
     "author": {
         "name": "Magius(CHE)",
         "email": "magiusche@magius.it"
     },
-    "repo": "https://github.com/MagiusCHE/gamedek-themes/default.git",
+    "repo": "https://github.com/MagiusCHE/gamedek-theme-default.git",
     "images": [
         "media/*"
     ],
@@ -17,11 +17,16 @@
         "3th/jquery-ui/jquery-ui.structure.min.css": "main_loaded",
         "3th/jquery-ui/jquery-ui.theme.min.css": "main_loaded",
         "3th/bootstrap.min.css": "main_loaded",
+        "3th/material-icons/material-icons.css": "materialicons_loaded",
         "main.css": "main_loaded",
         "fonts.css": "fonts_loaded"
     },
     "views": [
-        "home"
+        "home",
+        "settings"
+    ],
+    "templates": [
+        "templates/*"
     ],
     "entry": "home"
 }

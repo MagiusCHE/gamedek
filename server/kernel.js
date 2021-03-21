@@ -10,6 +10,7 @@ const fs = require('fs')
 const appStartedAt = new Date()
 let err_log, std_log, cmb_log, startupConfig
 const activeDebugs = {}
+const Plugin = require('./plugin')
 
 const $this = {
     init: () => {
@@ -62,11 +63,6 @@ const $this = {
                 }
             }
 
-            const themepath = path.join(appDataRoot, 'themes')
-            if (!fs.existsSync(themepath)) {
-                mkdirp.sync(themepath)
-            }
-
             const logpath = path.join($this.appDataRoot, 'logs')
             err_log = path.join(logpath, 'err.log')
             std_log = path.join(logpath, 'std.log')
@@ -116,6 +112,10 @@ const $this = {
 
             logError('Log error system started at %s on %s:', new Date().toISOString(), err_log)
 
+            $this.locale = app.getLocale()
+
+            log(`Locale is "${$this.locale}"`)
+
         } catch (err) {
             try {
                 if (!err_log) {
@@ -151,6 +151,16 @@ const $this = {
         }
 
 
+    },
+    getGamesCount: async function() {
+        const ret = {}
+        await $this.broadCastPluginMethod('gamelibrary', 'getGamesCount', ret)
+        return ret.count || 0
+    },
+    getGamesDetails: async function() {
+        const ret = {}
+        await $this.broadCastPluginMethod('gamelibrary', 'getGamesDetails', ret)
+        return ret.games
     },
     themeFullPath: undefined,
     getThemeUrl: async function({ relativePath }) {
@@ -192,12 +202,62 @@ const $this = {
 
         $this.clientOptions.theme = $this.clientOptions.theme || 'default';
 
-        $this.themeFullPath = path.resolve(path.join($this.appDataRoot, 'themes', $this.clientOptions.theme))
+        const pluginspath = path.join($this.appDataRoot, 'plugins')
+        if (!fs.existsSync(pluginspath)) {
+            mkdirp.sync(pluginspath)
+        }
+        const themepath = path.join($this.appDataRoot, 'themes')
+        if (!fs.existsSync(themepath)) {
+            mkdirp.sync(themepath)
+        }
+
+
+        $this.themeFullPath = path.resolve(path.join(themepath, $this.clientOptions.theme))
         if (!fs.existsSync($this.themeFullPath)) {
             $this.themeFullPath = path.resolve(path.join('.', 'themes', $this.clientOptions.theme))
         }
 
+        $this.pluginsFullPath = pluginspath
+
+        for (const plugin_name in $this.clientOptions.plugins) {
+            if ($this.clientOptions.plugins[plugin_name]) {
+                await $this.loadPlugin(plugin_name)
+            }
+        }
+
+        await $this.broadCastPluginMethod([], 'onApplicationStart', $this.clientOptions)
+
         return $this.clientOptions
+    },
+    fireOnGuiAppeared: async function() {
+        await $this.broadCastPluginMethod([], 'onOnGuiAppeared')
+    },
+    broadCastPluginMethod: async function() {
+        const args = Array.from(arguments)
+        const providers = args.shift()
+        const method = args.shift()
+        for (const plugin_name in $this.clientOptions.plugins) {
+            const plugin = $this.clientOptions.plugins[plugin_name]
+            if (plugin && (await plugin.provides(providers)) && plugin[method]) {
+                await plugin[method].apply(plugin, args)
+            }
+        }
+    },
+    loadPlugin: async (plugin_name) => {
+        log(`Activating plugin "${plugin_name}"...`);
+        let fullPath = path.resolve(path.join($this.pluginsFullPath, plugin_name))
+        if (!fs.existsSync(fullPath)) {
+            fullPath = path.resolve(path.join('.', 'plugins', plugin_name))
+        }
+        if (!fs.existsSync(fullPath)) {
+            logError(`Plugin load error. Scanned dirs:`)
+            logError(` - `, path.resolve(path.join($this.pluginsFullPath, plugin_name)))
+            logError(` - `, path.resolve(path.join('.', 'plugins', plugin_name)))
+            throw new Error(`Missing plugin "${plugin_name}". App cannnot be started.`)
+        }
+        const manifest = path.join(fullPath, 'manifest.json')
+        const plugin = await Plugin.create(fullPath, manifest)
+        $this.clientOptions.plugins[plugin_name] = plugin
     },
     applicationExit: async () => {
         $this.mainWindow.close();
@@ -223,6 +283,30 @@ const $this = {
             mkdirp.sync(savepath)
         }
         return fs.writeFileSync(dest, value)
+    },
+    provider: async function({ request, method, args }) {
+
+        for (const plugin_name in $this.clientOptions.plugins) {
+            const plugin = $this.clientOptions.plugins[plugin_name]
+            if (plugin && plugin.constructor) {
+                if (await plugin.provides(request)) {
+                    return await plugin[method](args)
+                }
+            }
+        }
+        return undefined
+    },
+    providers: async function({ request, method, args }) {
+        const ret = []
+        for (const plugin_name in $this.clientOptions.plugins) {
+            const plugin = $this.clientOptions.plugins[plugin_name]
+            if (plugin && plugin.constructor) {
+                if (await plugin.provides(request)) {
+                    ret.push(await plugin[method](args))
+                }
+            }
+        }
+        return ret
     },
     criticalError: async function({ err }) {
         logError('Critical error is invoked:', err.stack)
@@ -304,6 +388,7 @@ const logError = async function() {
     })
 }
 
+global.kernel = $this
 module.exports = $this
 
 function msToTime(duration) {
@@ -349,3 +434,34 @@ if (!('toJSON' in Error.prototype)) {
         writable: true
     });
 }
+
+String.prototype.matchAll = function(regex, callback) {
+    let m;
+    let str = this
+    while ((m = regex.exec(str)) !== null) {
+        // This is necessary to avoid infinite loops with zero-width matches
+        if (m.index === regex.lastIndex) {
+            regex.lastIndex++;
+        }
+
+        // The result can be accessed through the `m`-variable.
+        m.forEach((match, groupIndex) => {
+            const ret = callback(match)
+            if (ret !== undefined) {
+                str = str.replaceAll(match, ret)
+            }
+            /*let firstblockidx = match.indexOf(' ')
+            if (firstblockidx < 0) {
+                firstblockidx = match.indexOf('}')
+            }
+            const langid = match.substring(2, firstblockidx)
+
+            //(?<=")(.*?)(?=")
+            //const args = match.substr(2, match.length - 3)
+
+            this.log(`Found match, group ${groupIndex}: ${match}, ${firstblock}`);*/
+        });
+    }
+    return str
+};
+

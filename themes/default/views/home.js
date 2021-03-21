@@ -3,10 +3,6 @@
 
     }
     async beginAppear() {
-        //first appear after ini
-        //if (this.#visbilePageId) {
-        //    await this.hideView()
-        //}        
-        //$('body').append(back)
+        
     }
 }

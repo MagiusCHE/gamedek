@@ -12,21 +12,23 @@ if (!argsObj.develop) {
     process.env.NODE_ENV = 'production'
 }
 
+global.production = process.env.NODE_ENV == 'production'
+
 function createWindow() {
     // Create the browser window.
     const mainScreen = electron.screen.getPrimaryDisplay()
 
     const mainWindow = new BrowserWindow({
-        width: mainScreen.size.width,
-        height: mainScreen.size.height,
+        width: Math.min(1280, mainScreen.size.width),
+        height: Math.min(800, mainScreen.size.height),
         webPreferences: {
             preload: path.join(__dirname, './server/preload.js'),
             contextIsolation: false,
             //nodeIntegration: false,
             //enableRemoteModule: true
         },
-        show: true, //argsObj.develop ? true : false,
-        frame: argsObj.develop ? true : false,
+        show: false, //argsObj.develop ? true : false,
+        frame: true,
     })
 
     const kernel = require('./server/kernel')
@@ -34,7 +36,6 @@ function createWindow() {
     kernel.init()
 
     globalShortcut.register('F11', () => {
-        console.log('F11 pressed')
         if (mainWindow.isFullScreen()) {
             mainWindow.setFullScreen(false)
             mainWindow.setMenu(_cachedDefaultMenu)
@@ -72,7 +73,13 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', function() {
+    if (argsObj.debugger) {
+        setTimeout(createWindow, 1000)
+    } else {
+        createWindow()
+    }
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {

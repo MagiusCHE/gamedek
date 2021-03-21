@@ -16,7 +16,7 @@
             'scripts/theme.js',
             'scripts/themeview.js'
         ],
-        styles: {            
+        styles: {
         },
         options: {
             debug: {},
@@ -272,10 +272,10 @@
                     }
                     const ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = false;
                     $(ga).on('load', () => {
-                        toload--;
                         if ($this.options.log.loadjs) {
                             log('Loaded JS', url)
                         }
+                        toload--;
                     });
                     ga.src = $this.versionUrl(urls[h]);
                     s.appendChild(ga);
@@ -312,7 +312,9 @@
                     if ($this.options.log.loadcss) {
                         log('Load CSS', url)
                     }
-                    $('#csscontroller').append('<div id=\'' + idsel + '\'></div>');
+                    if ($('#csscontroller').find('#' + idsel).length == 0) {
+                        $('#csscontroller').append('<div id=\'' + idsel + '\'></div>');
+                    }
                     const s = document.getElementsByTagName('head')[0];
                     ga = document.createElement('link'); ga.type = 'text/css'; ga.async = false;
                     ga.setAttribute('rel', 'stylesheet');
@@ -356,8 +358,8 @@
                     for (const img of imgs) {
                         tot += img.naturalWidth > 0 ? 1 : 0;
                         if (img.naturalWidth > 0 && $this.options.log.loadimages && !loaded[img.src]) {
-                            loaded[img.src] = true
                             log('Loaded Image', img.src)
+                            loaded[img.src] = true
                         }
                     }
                     return tot == imgs.length;
@@ -419,7 +421,7 @@
                 await waitFor(() => tot == 0)
 
                 if (!$this.boolEval('Theme')) {
-                    logError('Syntax error on theme. Check developer console')
+                    logError('Syntax error on theme. Check developer console.')
                     await $this.kernel.showWindow()
                     window.initialWindowAppeared = true
                     return
@@ -439,7 +441,7 @@
 
                 window.initialWindowAppeared = true
 
-                await $this.theme.appear()
+                await $this.theme.onThemeAppeared()
 
                 //await $this.
                 //await $this.loadJSON()
@@ -448,6 +450,7 @@
                 $this.kernel.criticalError(err)
             }
         },
+
         updateClientWindowSize: () => {
             const win = {
                 h: $(window).height(),
@@ -829,17 +832,7 @@
             return !prev
         },
         exit: () => {
-            // test if desktop object exists
-            if (window.CBKernel) {
-                setTimeout(() => {
-                    window.CBKernel.applicationExit();
-                }, 10);
-            } else {
-                setTimeout(() => {
-                    alert('u can close bworser!');
-                    // self.close();
-                }, 10);
-            }
+            $this.kernel.applicationExit();
         },
         showOptions: () => {
             $this.showWindowByTemplate('main_options', true);

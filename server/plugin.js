@@ -1,0 +1,66 @@
+//require(path.join(fullPath,''))
+const fs = require('fs')
+const path = require('path')
+class Plugin {
+    static async create(root, manifest) {
+        const classname = require(path.join(root, 'plugin.js'))
+
+        const plugin = new classname(root, manifest)
+
+        await plugin.init()
+
+        return plugin
+    }
+    #rootPath = undefined
+    manifest = undefined
+    constructor(root, manifest) {
+        this.#rootPath = root
+        this.manifest = JSON.parse(fs.readFileSync(manifest).toString())
+        this.#name = this.manifest.simpleName || this.manifest.name.split('.').pop()
+    }
+    pluginPath(relpath) {
+        return path.resolve(path.join(this.#rootPath, relpath))
+    }
+    async provides(request) {
+        if (!request || request.length==0) {
+            return true
+        }
+        request = Array.isArray(request) ? request : [request]
+        if (!this.manifest.provides) {
+            return false
+        }
+        if (!request[0] || request[0].length == 0) {
+            return true;
+        }
+        const avail = this.manifest.provides.split(',')
+        for (const r of request) {            
+            if (avail.indexOf(r) > -1) {
+                return true
+            }
+        }
+        return false
+    }
+    #name = undefined
+    toString() {
+        return this.#name
+    }
+    async log() {
+        return kernel.logRawEx({
+            level: 'I',
+            sender: this.toString(),
+            args: Array.from(arguments)
+        })
+    }
+    async logError() {
+        return kernel.logRawEx({
+            level: 'E', //error
+            sender: this.toString(),
+            args: Array.from(arguments)
+        })
+    }
+    async init() {
+    }
+
+}
+global.Plugin = Plugin
+module.exports = Plugin

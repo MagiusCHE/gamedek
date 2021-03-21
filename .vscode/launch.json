@@ -10,7 +10,8 @@
             "runtimeArgs": [
                 "--remote-debugging-port=9223",
                 ".",
-                "--develop"
+                "--develop",
+                "--debugger"
             ],
             "windows": {
                 "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"

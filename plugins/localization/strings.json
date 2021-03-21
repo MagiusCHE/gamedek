@@ -1,0 +1,13 @@
+{
+    "comments": [
+        "Arguments will passed in https://www.npmjs.com/package/sprintf-js formats."
+    ],
+    "en": {
+        "initialization_pleasewait": "System initialization. Please wait...",
+        "loading_please_wait": "Loading. Please wait..."
+    },
+    "it": {
+        "initialization_pleasewait": "Inizializzazione in corso...",
+        "loading_please_wait": "Caricamento in corso..."
+    }
+}
