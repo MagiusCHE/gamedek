@@ -34,15 +34,19 @@ class myplugin extends global.Plugin {
         fs.writeFileSync(this.#lib_path, JSON.stringify(this.#library))
         this.log('Library saved.')
     }
-    async getGamesCount(ret) {
-        ret.count = this.#library.games.length
+    async getImportActions() {
+        const actions = {}
+        await kernel.broadCastPluginMethod('gameengine', 'getImportAction', actions)
+        return actions
     }
-    async onOnGuiAppeared() {
+    async getGamesCount() {
+        return this.#library.games.length
+    }
+    async onOnGuiAppearing() {
         this.log('Initialize. check libraries')
         await this.loadLibrary()
-        //kernel.notifygui('')
-
-        //await kernel.broadCastPluginMethod('library','initialize')
+    }
+    async onOnGuiAppeared() {
     }
 }
 

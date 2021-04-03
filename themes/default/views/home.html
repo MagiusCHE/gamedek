@@ -2,8 +2,13 @@
     <div id="view-background"></div>
     <div id="app-view">
         <h1>Gamedek</h1>
-        <p>
-            ${lang.welcome arg1 arg2}
-        </p>
+        <div id="nogameinlist">
+            ${lang.nogameinlibrary_p1} <span style="font-size: 1.4rem;" title="${lang.addnewgame}" class="header-inline-icon material-icons-outlined d-inline-block mr-1 align-bottom" onclick="$('#gd-header [data-view=&quot;add&quot;]').click()">
+                add_to_queue
+            </span>
+            ${lang.nogameinlibrary_p2}
+        </div>
+        <div id="gamegrid">
+        </div>
     </div>
 </body>

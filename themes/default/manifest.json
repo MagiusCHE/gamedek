@@ -23,6 +23,7 @@
     },
     "views": [
         "home",
+        "add",
         "settings"
     ],
     "templates": [

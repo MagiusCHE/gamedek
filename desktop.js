@@ -34,7 +34,6 @@ function createWindow() {
     const kernel = require('./server/kernel')
 
     kernel.init()
-
     globalShortcut.register('F11', () => {
         if (mainWindow.isFullScreen()) {
             mainWindow.setFullScreen(false)
@@ -65,10 +64,10 @@ function createWindow() {
         //mainWindow.webContents.send('CBKernel', CBKernel);
 
     })
-
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools()
 }
+// Open the DevTools.
+// mainWindow.webContents.openDevTools()
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -32,7 +32,7 @@ class Theme_default extends Theme {
             } else {
                 $('#app-view').animate({ opacity: 1 }, 600, resolve)
             }
-            
+
         })
     }
 
@@ -46,7 +46,7 @@ class Theme_default extends Theme {
 
     async onThemeAppeared() {
         await super.onThemeAppeared()
-        const games = await core.kernel.getGamesCount();
+        //const games = await core.kernel.gameList_getGamesCount();
     }
 
     async updateGreatLoader(message, target) {

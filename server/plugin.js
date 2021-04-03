@@ -21,6 +21,9 @@ class Plugin {
     pluginPath(relpath) {
         return path.resolve(path.join(this.#rootPath, relpath))
     }
+    async onAllPluginsLoaded(plugins) {
+        
+    }
     async provides(request) {
         if (!request || request.length==0) {
             return true

@@ -1,12 +1,21 @@
 <body>
     <div id="gd-header">
-        <span data-view="home" onclick="core.theme.changeView($(this).attr('data-view'))" class="icon material-icons-outlined d-inline-block mr-1">
+        <span data-view="home" title="${lang.mylibrary}" onclick="core.theme.changeView($(this).attr('data-view'))" class="icon material-icons-outlined d-inline-block mr-1">
             home
         </span>
-        <span data-view="settings" onclick="core.theme.changeView($(this).attr('data-view'))" class="icon material-icons-outlined d-inline-block mr-1">
+        <span data-view="add" title="${lang.addnewgame}" onclick="core.theme.changeView($(this).attr('data-view'))" class="icon material-icons-outlined d-inline-block mr-1">
+            add_to_queue
+        </span>
+        <span data-view="view_list" title="${lang.viewlist}" class="icon material-icons-outlined d-inline-block mr-1">
+            reorder
+        </span>
+        <span data-view="view_grid" title="${lang.viewblocks}" class="icon material-icons-outlined d-inline-block mr-1">
+            dashboard
+        </span>
+        <span data-view="settings" title="${lang.settings}" onclick="core.theme.changeView($(this).attr('data-view'))" class="icon material-icons-outlined d-inline-block mr-1">
             settings
         </span>
-        <span class="icon material-icons-outlined d-inline-block mr-1" onclick="core.exit()">
+        <span class="icon material-icons-outlined d-inline-block mr-1" title="${lang.quit}" onclick="core.exit()">
             power_settings_new
         </span>
     </div>

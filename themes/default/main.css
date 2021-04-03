@@ -88,12 +88,25 @@ body.loading #gd-view
     opacity: 1;
 }
 
-[data-gd-view="home"] #gd-header .icon[data-view="home"]{
+.header-inline-icon{
+    cursor: pointer;
+    filter: brightness(0.9);
+    vertical-align: bottom;    
+}
+
+.header-inline-icon:hover{
+    filter: brightness(1.1);
+}
+
+
+[data-gd-view="home"] #gd-header .icon[data-view="home"],
+[data-gd-view="add"] #gd-header .icon[data-view="add"],
+[data-gd-view="settings"] #gd-header .icon[data-view="settings"]{
     opacity: 1;
 }
 
-[data-gd-view="settings"] #gd-header .icon[data-view="settings"]{
-    opacity: 1;
+.template{
+    display: none;
 }
 
 #csscontroller #main_loaded {

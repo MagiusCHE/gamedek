@@ -3,6 +3,7 @@
     "plugins": {
         "gamelib.local": false,
         "gamelib.lutris": true,
+        "gamelib.linux": true,
         "gamelib.manager": true,
         "localization": true
     },

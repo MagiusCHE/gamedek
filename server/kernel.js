@@ -152,15 +152,20 @@ const $this = {
 
 
     },
-    getGamesCount: async function() {
-        const ret = {}
-        await $this.broadCastPluginMethod('gamelibrary', 'getGamesCount', ret)
-        return ret.count || 0
+    getProvider: async function(providers) {
+        for (const plugin_name in $this.clientOptions.plugins) {
+            const plugin = $this.clientOptions.plugins[plugin_name]
+            if (plugin && (await plugin.provides(providers))) {
+                return plugin
+            }
+        }
+        return undefined
     },
-    getGamesDetails: async function() {
-        const ret = {}
-        await $this.broadCastPluginMethod('gamelibrary', 'getGamesDetails', ret)
-        return ret.games
+    gameList_getImportActions: async function() {
+        return await $this.gameList.getImportActions()
+    },
+    gameList_getGamesCount: async function() {
+        return await $this.gameList.getGamesCount()
     },
     themeFullPath: undefined,
     getThemeUrl: async function({ relativePath }) {
@@ -225,12 +230,24 @@ const $this = {
             }
         }
 
+        await $this.broadCastPluginMethod([], 'onAllPluginsLoaded', $this.clientOptions.plugins)
+
         await $this.broadCastPluginMethod([], 'onApplicationStart', $this.clientOptions)
+
+        $this.gameList = await $this.getProvider('gamelibrary')
+        log('Gamelibrary loaded')
+
+        if (!$this.gameList) {
+            throw new Error('Missing plugin provides "gamelibrary"')
+        }
 
         return $this.clientOptions
     },
     fireOnGuiAppeared: async function() {
         await $this.broadCastPluginMethod([], 'onOnGuiAppeared')
+    },
+    fireOnGuiAppearing: async function() {
+        await $this.broadCastPluginMethod([], 'onOnGuiAppearing')
     },
     broadCastPluginMethod: async function() {
         const args = Array.from(arguments)
@@ -284,7 +301,23 @@ const $this = {
         }
         return fs.writeFileSync(dest, value)
     },
-    provider: async function({ request, method, args }) {
+    broadCastPluginMethod: async function() {
+        const args = Array.from(arguments)
+        const providers = args.shift()
+        const method = args.shift()
+        for (const plugin_name in $this.clientOptions.plugins) {
+            const plugin = $this.clientOptions.plugins[plugin_name]
+            if (plugin && (await plugin.provides(providers)) && plugin[method]) {
+                await plugin[method].apply(plugin, args)
+            }
+        }
+    },
+    translateBlock: async function({ text }) {
+        const _args = { text: text }
+        await $this.broadCastPluginMethod('localization', `translateBlock`, _args)
+        return _args.text
+    },
+    /*provider: async function({ request, method, args }) {
 
         for (const plugin_name in $this.clientOptions.plugins) {
             const plugin = $this.clientOptions.plugins[plugin_name]
@@ -295,19 +328,7 @@ const $this = {
             }
         }
         return undefined
-    },
-    providers: async function({ request, method, args }) {
-        const ret = []
-        for (const plugin_name in $this.clientOptions.plugins) {
-            const plugin = $this.clientOptions.plugins[plugin_name]
-            if (plugin && plugin.constructor) {
-                if (await plugin.provides(request)) {
-                    ret.push(await plugin[method](args))
-                }
-            }
-        }
-        return ret
-    },
+    },*/
     criticalError: async function({ err }) {
         logError('Critical error is invoked:', err.stack)
         logError('App will be closed.')

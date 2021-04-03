@@ -1,13 +1,34 @@
 {
     "comments": [
-        "Arguments will passed in https://www.npmjs.com/package/sprintf-js formats."
+        "Arguments will passed in https://www.npmjs.com/package/sprintf-js formats.",
+        "Available locales can be found at https://www.electronjs.org/docs/api/locales"
     ],
     "en": {
         "initialization_pleasewait": "System initialization. Please wait...",
-        "loading_please_wait": "Loading. Please wait..."
+        "loading_please_wait": "Loading. Please wait...",
+        "nogameinlibrary_p1": "<p>There is no game in you library.</p><p>Use ",
+        "nogameinlibrary_p2": " to add new game.</p>",
+        "mylibrary": "Library",
+        "addnewgame": "Add a game",
+        "viewlist": "Change to list view",
+        "viewblocks": "Change to block view",
+        "settings": "Settings",
+        "quit": "Quit",
+        "addgame_title": "Import games",
+        "addgame_actiontip": "Select import method:"
     },
     "it": {
         "initialization_pleasewait": "Inizializzazione in corso...",
-        "loading_please_wait": "Caricamento in corso..."
+        "loading_please_wait": "Caricamento in corso...",
+        "nogameinlibrary_p1": "<p>Non hai alcun gioco nella libreria.</p><p>Clicca su ",
+        "nogameinlibrary_p2": " e aggiungine uno.</p>",
+        "mylibrary": "Libreria",
+        "addnewgame": "Aggiungi un gioco",
+        "viewlist": "Visualizza come lista",
+        "viewblocks": "Vista a blocchi",
+        "settings": "Importazioni",
+        "quit": "Esci",
+        "addgame_title": "Importa giochi",
+        "addgame_actiontip": "Scegli il metodo di importazione:"
     }
 }
