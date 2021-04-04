@@ -1,8 +1,10 @@
 {
     "en": {
-        "ge_import_linux": "Choose linux executable"
+        "ge_import_linux": "by Linux Executable",
+        "ge_import_linux_short": "Linux Executable"
     },
     "it": {
-        "ge_import_linux": "Segli un file esebuibile linux"
+        "ge_import_linux": "un file Eseguibile Linux",
+        "ge_import_linux_short": "Eseguibile Linux"
     }
 }

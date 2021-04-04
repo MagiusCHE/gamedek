@@ -6,6 +6,5 @@
         "email": "magiusche@magius.it"
     },
     "repo": "https://github.com/MagiusCHE/gamedek-puglins-gamelib-linux.git",
-    "provides": "gameengine",
-    "localized": true
+    "provides": "gameengine"
 }

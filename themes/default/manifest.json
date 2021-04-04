@@ -24,6 +24,7 @@
     "views": [
         "home",
         "add",
+        "addinfo",
         "settings"
     ],
     "templates": [

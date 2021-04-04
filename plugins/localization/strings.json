@@ -15,7 +15,9 @@
         "settings": "Settings",
         "quit": "Quit",
         "addgame_title": "Import games",
-        "addgame_actiontip": "Select import method:"
+        "addgameinfo_title": "Import",
+        "addgame_actiontip": "Select import method:",
+        "goback": "go back"
     },
     "it": {
         "initialization_pleasewait": "Inizializzazione in corso...",
@@ -29,6 +31,8 @@
         "settings": "Importazioni",
         "quit": "Esci",
         "addgame_title": "Importa giochi",
-        "addgame_actiontip": "Scegli il metodo di importazione:"
+        "addgameinfo_title": "Importa:",
+        "addgame_actiontip": "Scegli il metodo di importazione:",
+        "goback": "indietro"
     }
 }

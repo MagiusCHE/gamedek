@@ -22,10 +22,10 @@ class Plugin {
         return path.resolve(path.join(this.#rootPath, relpath))
     }
     async onAllPluginsLoaded(plugins) {
-        
+
     }
     async provides(request) {
-        if (!request || request.length==0) {
+        if (!request || request.length == 0) {
             return true
         }
         request = Array.isArray(request) ? request : [request]
@@ -36,7 +36,7 @@ class Plugin {
             return true;
         }
         const avail = this.manifest.provides.split(',')
-        for (const r of request) {            
+        for (const r of request) {
             if (avail.indexOf(r) > -1) {
                 return true
             }
@@ -47,19 +47,22 @@ class Plugin {
     toString() {
         return this.#name
     }
+    getName() {
+        return this.#name
+    }
     async log() {
-        return kernel.logRawEx({
-            level: 'I',
-            sender: this.toString(),
-            args: Array.from(arguments)
-        })
+        return kernel.logRawEx(
+            'I',
+            this.toString(),
+            Array.from(arguments)
+        )
     }
     async logError() {
-        return kernel.logRawEx({
-            level: 'E', //error
-            sender: this.toString(),
-            args: Array.from(arguments)
-        })
+        return kernel.logRawEx(
+            'E', //error
+            this.toString(),
+            Array.from(arguments)
+        )
     }
     async init() {
     }

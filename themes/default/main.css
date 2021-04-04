@@ -77,30 +77,38 @@ body.loading #gd-view
     z-index: 1;
     font-size: 1.7rem;
     padding-left:0.5rem;
+    width: 100%;
 }
 
-#gd-header .icon{
-    opacity: 0.7;
-    cursor: pointer;
-}
-
-#gd-header .icon:hover{
-    opacity: 1;
-}
-
+#gd-header .icon,
 .header-inline-icon{
+    filter: brightness(0.80);
     cursor: pointer;
-    filter: brightness(0.9);
-    vertical-align: bottom;    
+    transition: opacity ease-in-out 200ms;  
 }
 
+#gd-header .icon:hover,
 .header-inline-icon:hover{
     filter: brightness(1.1);
 }
 
 
+#gd-header #goback{
+    display: inline-block;
+    opacity: 0;
+    pointer-events: none;
+    transform: scaleX(-1);
+    float: right;    
+}
+
+[data-gd-view="addinfo"] #gd-header #goback{
+    opacity: 1;
+    pointer-events: all;
+}
+
 [data-gd-view="home"] #gd-header .icon[data-view="home"],
 [data-gd-view="add"] #gd-header .icon[data-view="add"],
+[data-gd-view="addinfo"] #gd-header .icon[data-view="add"],
 [data-gd-view="settings"] #gd-header .icon[data-view="settings"]{
     opacity: 1;
 }

@@ -36,7 +36,7 @@ class myplugin extends global.Plugin {
     }
     async getImportActions() {
         const actions = {}
-        await kernel.broadCastPluginMethod('gameengine', 'getImportAction', actions)
+        await kernel.broadcastPluginMethod('gameengine', 'getImportAction', actions)
         return actions
     }
     async getGamesCount() {

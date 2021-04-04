@@ -25,15 +25,16 @@ const $this = {
             for (const fun of Object.keys($this)) {
                 if (typeof $this[fun] === 'function') {
                     ipcMain.handle('kernel.' + fun, async (event, marg) => {
-                        const args = {}
-                        const arg = JSON.parse(marg)
-                        let c = 0
+                        //const args = []
+                        const args = JSON.parse(marg)
+                        /*let c = 0
                         for (const name of getParamNames($this[fun])) {
-                            args[name] = arg[c]
+                            //args[name] = arg[c]
+                            args.push(arg[c])
                             c++
-                        }
+                        }*/
                         try {
-                            let ret = await $this[fun](args)
+                            let ret = await $this[fun].apply($this, args)
                             return JSON.stringify({
                                 "return": ret
                             })
@@ -168,10 +169,10 @@ const $this = {
         return await $this.gameList.getGamesCount()
     },
     themeFullPath: undefined,
-    getThemeUrl: async function({ relativePath }) {
+    getThemeUrl: async function(relativePath) {
         return 'file://' + $this.securePath($this.themeFullPath, relativePath)
     },
-    getThemeUrls: async function({ relativePath }) {
+    getThemeUrls: async function(relativePath) {
         const rpath = $this.securePath($this.themeFullPath, relativePath)
         const ret = []
         if (rpath) {
@@ -184,10 +185,10 @@ const $this = {
         }
         return ret;
     },
-    getThemePath: async function({ relativePath }) {
+    getThemePath: async function(relativePath) {
         return $this.securePath($this.themeFullPath, relativePath)
     },
-    existsThemeFile: async function({ relativePath }) {
+    existsThemeFile: async function(relativePath) {
         return fs.existsSync($this.securePath($this.themeFullPath, relativePath))
     },
     securePath: (root, rel) => {
@@ -198,7 +199,7 @@ const $this = {
         return ret
     },
     clientOptions: undefined,
-    applicationStart: async function({ options }) {
+    applicationStart: async function(options) {
         $this.clientOptions = {
             ...options, ...JSON.parse(JSON.stringify(startupConfig))
         }
@@ -230,9 +231,9 @@ const $this = {
             }
         }
 
-        await $this.broadCastPluginMethod([], 'onAllPluginsLoaded', $this.clientOptions.plugins)
+        await $this.broadcastPluginMethod([], 'onAllPluginsLoaded', $this.clientOptions.plugins)
 
-        await $this.broadCastPluginMethod([], 'onApplicationStart', $this.clientOptions)
+        await $this.broadcastPluginMethod([], 'onApplicationStart', $this.clientOptions)
 
         $this.gameList = await $this.getProvider('gamelibrary')
         log('Gamelibrary loaded')
@@ -244,12 +245,24 @@ const $this = {
         return $this.clientOptions
     },
     fireOnGuiAppeared: async function() {
-        await $this.broadCastPluginMethod([], 'onOnGuiAppeared')
+        await $this.broadcastPluginMethod([], 'onOnGuiAppeared')
     },
     fireOnGuiAppearing: async function() {
-        await $this.broadCastPluginMethod([], 'onOnGuiAppearing')
+        await $this.broadcastPluginMethod([], 'onOnGuiAppearing')
     },
-    broadCastPluginMethod: async function() {
+    pluginMethod: async function() {
+        const args = Array.from(arguments)
+        const providers = args.shift()
+        const method = args.shift()
+        for (const plugin_name in $this.clientOptions.plugins) {
+            const plugin = $this.clientOptions.plugins[plugin_name]
+            if (plugin && (await plugin.provides(providers)) && plugin[method]) {
+                return await plugin[method].apply(plugin, args)
+            }
+        }
+        return undefined
+    },
+    broadcastPluginMethod: async function() {
         const args = Array.from(arguments)
         const providers = args.shift()
         const method = args.shift()
@@ -285,7 +298,7 @@ const $this = {
             $this.mainWindow.webContents.openDevTools()
         }
     },
-    loadData: async ({ name }) => {
+    loadData: async (name) => {
         const savepath = path.join(appDataRoot, 'save')
         const dest = path.join(savepath, name + '.json')
         if (!fs.existsSync(dest)) {
@@ -293,7 +306,7 @@ const $this = {
         }
         return fs.readFileSync(dest).toString()
     },
-    storeData: async ({ name, value }) => {
+    storeData: async (name, value) => {
         const savepath = path.join(appDataRoot, 'save')
         const dest = path.join(savepath, name + '.json')
         if (!fs.existsSync(savepath)) {
@@ -301,7 +314,7 @@ const $this = {
         }
         return fs.writeFileSync(dest, value)
     },
-    broadCastPluginMethod: async function() {
+    broadcastPluginMethod: async function() {
         const args = Array.from(arguments)
         const providers = args.shift()
         const method = args.shift()
@@ -312,9 +325,9 @@ const $this = {
             }
         }
     },
-    translateBlock: async function({ text }) {
+    translateBlock: async function(text) {
         const _args = { text: text }
-        await $this.broadCastPluginMethod('localization', `translateBlock`, _args)
+        await $this.broadcastPluginMethod('localization', `translateBlock`, _args)
         return _args.text
     },
     /*provider: async function({ request, method, args }) {
@@ -329,7 +342,7 @@ const $this = {
         }
         return undefined
     },*/
-    criticalError: async function({ err }) {
+    criticalError: async function(err) {
         logError('Critical error is invoked:', err.stack)
         logError('App will be closed.')
         dialog.showMessageBoxSync({
@@ -339,7 +352,7 @@ const $this = {
         })
         app.quit();
     },
-    logRawEx: async function({ level, sender, args }) {
+    logRawEx: async function(level, sender, args) {
         if (args == undefined || args.length == 0) {
             return;
         }

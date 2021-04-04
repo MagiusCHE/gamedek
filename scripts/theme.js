@@ -208,14 +208,20 @@ class Theme {
     async onBeginViewShow() {
         //render actual view        
         await this.prepareCurrentView()
-        await this.#views[this.#visbilePageId]?.obj.onBeginShow()
+        await this.getCurrentView()?.obj.onBeginShow()
     }
     async resetView(id) {
-        const classname = eval('ThemeView_' + id)
+        let classname
+        try {
+            classname = eval('ThemeView_' + id)
+        } catch (err) {
+            classname = eval('ThemeView')
+        }
         this.#views[id] = {
             obj: new classname(id),
             cnt: $(`<div id="gd-view" data-gd-view="${id}">` + (await this.translateBlock(await this.getTemplate(id))) + '</div>')
         }
+        await this.#views[id].obj.init(await this.#views[id].cnt)
     }
     async translateBlock(text) {
         return await core.kernel.translateBlock(text)
@@ -244,23 +250,29 @@ class Theme {
         await this.appearedCurrentView()
     }
     async hideCurrentView() {
-        await this.#views[this.#visbilePageId]?.obj.onHide()
+        await this.getCurrentView()?.obj.onHide()
+    }
+    getCurrentView() {
+        return this.getView(this.#visbilePageId)
+    }
+    getView(id) {
+        return this.#views[id]
     }
     async prepareCurrentView() {
-        $('body #gd-viewscontainer #gd-view').remove()
+        $('body #gd-viewscontainer #gd-view').detach()
 
-        if (!this.#views[this.#visbilePageId]) {
+        if (!this.getCurrentView()) {
             await this.resetView(this.#visbilePageId)
         }
-        const view = this.#views[this.#visbilePageId].cnt
+        const view = this.getCurrentView().cnt
         $('body #gd-viewscontainer').append(view)
         $('html').attr('data-gd-view', this.#visbilePageId)
     }
     async appearCurrentView() {
-        await this.#views[this.#visbilePageId]?.obj.onAppear()
+        await this.getCurrentView()?.obj.onAppear()
     }
     async appearedCurrentView() {
-        await this.#views[this.#visbilePageId]?.obj.onAppeared()
+        await this.getCurrentView()?.obj.onAppeared()
     }
     #visbilePageId = undefined
     async setPage(pageid) {
