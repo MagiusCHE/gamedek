@@ -55,14 +55,15 @@ class myplugin extends global.Plugin {
                 const rawargs = rest.split(' ')
                 let quotedopened = false
                 rawargs.forEach(a => {
-                    if (totargs.length > 0 || !quotedopened) {
-                        totargs.push(a)
+                    if (!quotedopened) {
                         quotedopened = (a.substring(0, 1) == '"')
+                        totargs.push(quotedopened ? a.substr(1) : a)                        
                     } else {
                         totargs[totargs.length - 1] += ' ' + a
                     }
                     if (a.substr(a.length - 1, 1) == '"' && quotedopened) {
                         quotedopened = false
+                        totargs[totargs.length - 1] = totargs[totargs.length - 1].substr(0, totargs[totargs.length - 1].length-1)
                     }
                 })
             }

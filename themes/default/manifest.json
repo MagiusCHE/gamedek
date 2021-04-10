@@ -10,7 +10,9 @@
         "media/*"
     ],
     "scripts": [
-        "3th/jquery-ui/jquery-ui.min.js"
+        "3th/jquery-ui/jquery-ui.min.js",
+        "3th/popper.min.js",
+        "3th/bootstrap.min.js"
     ],
     "styles": {
         "3th/jquery-ui/jquery-ui.min.css": "main_loaded",

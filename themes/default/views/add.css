@@ -1,0 +1,11 @@
+﻿[data-gd-view="add"] #app-view{
+
+}
+
+#importmethods_tbox button[data-action]{
+    margin-right: 1rem;
+}
+
+#csscontroller #add_loaded {
+    width: 100px;
+}

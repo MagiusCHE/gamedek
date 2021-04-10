@@ -9,7 +9,7 @@ class myplugin extends global.Plugin {
         if (!actions['gameengine']) {
             actions['gameengine'] = {}
         }
-        actions['gameengine']['lutris.import'] = {
+        actions['gameengine']['import.lutris'] = {
             button: await kernel.translateBlock('${lang.ge_import_lutris}'),
             short: await kernel.translateBlock('${lang.ge_import_lutris_short}'),
             args: true
@@ -17,7 +17,7 @@ class myplugin extends global.Plugin {
         }
     }
     async onButtonClick(action) {
-        if (action != 'lutris.import') {
+        if (action != 'import.lutris') {
             return
         }
         //kernel.guiEvent('')

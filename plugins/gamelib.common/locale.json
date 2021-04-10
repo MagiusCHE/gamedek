@@ -1,0 +1,28 @@
+{
+    "en": {
+        "ge_com_info_tabinfo": "Info",
+        "ge_com_info_tabinfo_title": "Title",
+        "ge_com_info_tabinfo_imgland": "Banner",
+        "ge_com_info_tabinfo_imgport": "Portrait",
+        "ge_com_info_tabinfo_icon": "Icon",
+        "ge_com_info_tabinfo_year": "Year",
+        "ge_com_info_image_flabel": "Image",
+        "ge_com_info_required_title": "Required field",
+        "ge_com_info_required": "Field \"%s\" is required.",
+        "ge_com_info_filenotfound_title": "Missing file",
+        "ge_com_info_filenotfound": "\"%s\" \"%s\" not exists of is not accessible."
+    },
+    "it": {
+        "ge_com_info_tabinfo": "Informazioni",
+        "ge_com_info_tabinfo_title": "Titolo",
+        "ge_com_info_tabinfo_imgland": "Immagine banner",
+        "ge_com_info_tabinfo_imgport": "Icona grande",
+        "ge_com_info_tabinfo_icon": "Icona piccola",
+        "ge_com_info_tabinfo_year": "Anno",
+        "ge_com_info_image_flabel": "Immagine",
+        "ge_com_info_required_title": "Campo richiesto",
+        "ge_com_info_required": "Il campo \"%s\" è obbligatorio.",
+        "ge_com_info_filenotfound_title": "File mancante",
+        "ge_com_info_filenotfound": "\"%s\" \"%s\" non esiste o non è accessibile."
+    }
+}

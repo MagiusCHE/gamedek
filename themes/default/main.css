@@ -9,7 +9,7 @@ html, body, #gd-viewscontainer {
 body.gd-body{
     font-family: 'Exo 2', sans-serif ;
     font-weight: 300;
-    color: #d9d9d9;
+    /*color: #d9d9d9;*/
 }
 
 #gd-viewscontainer {
@@ -53,12 +53,15 @@ body.loading #gd-view
     padding-top:2rem;
     padding-left:0.5rem;
     padding-right:0.5rem;
+    width: 100%;
+    height: 100%;
 }
 
 #great-loader {
     position: fixed;
     left:50%;
     top: 30%;
+    pointer-events: none;
 }
 
 #great-loader .message {
@@ -115,6 +118,68 @@ body.loading #gd-view
 
 .template{
     display: none;
+}
+
+/*a{
+    color: #97e2ff;
+}
+a:hover{
+    color: #d9d9d9;
+}*/
+
+.nav-tabs .nav-item {
+    margin-right: 3px;
+}
+
+.tab-content{
+    padding-top: 1rem;
+}
+
+.tab-pane .form-group.row .col-form-label{
+    border: 1px solid #333;
+    border-top-left-radius: 1rem;
+    
+}
+
+@media (min-width: 576px) {
+    .tab-pane .form-group.row .col-form-label{
+        border-bottom-left-radius: 1rem;
+    }
+}
+
+.tab-pane .form-group.row .valuecont{
+    border: 1px solid #333;
+    background-color: #3333335e;
+}
+
+.btn_browse{
+    position: absolute;
+    right: 0.3rem;
+    top: 0.1rem;
+    font-size: 1.3rem;
+    color: #555;
+    cursor: pointer;
+}
+
+.valuecont.filebrowser{
+    padding-right: 2rem;
+}
+
+.btn_browse:hover{
+    color: #888;
+}
+
+select option {
+    background-color: #414141 !important;
+}
+
+.required{
+    color: red;
+}
+
+.form-control-plaintext{
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
 }
 
 #csscontroller #main_loaded {

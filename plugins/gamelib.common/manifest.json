@@ -1,0 +1,10 @@
+{
+    "name": "it.magius.gamedek.plugin.gamelib.common",
+    "version": "1.0.0",
+    "author": {
+        "name": "Magius(CHE)",
+        "email": "magiusche@magius.it"
+    },
+    "repo": "https://github.com/MagiusCHE/gamedek-puglins-gamelib-common.git",
+    "provides": "gameengine"
+}

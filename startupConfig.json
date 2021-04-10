@@ -1,8 +1,9 @@
 {
     "theme": "default",
     "plugins": {
-        "gamelib.lutris": true,
+        "gamelib.common": true,
         "gamelib.linux": true,
+        "gamelib.lutris": true,
         "gamelib.manager": true,
         "localization": true
     },

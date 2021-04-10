@@ -19,11 +19,11 @@
                     } else {
                         core.kernel.pluginMethod(provider, 'onButtonClick', actionid)
                     }
-                })
+                })                
                 view.find('#importmethods_tbox').append(cnt)
+                await core.theme.onNewElementAdded(cnt)
             }
         }
-        this.log(actions)
     }
     getLastImportActionPressed() {
         return this.#lastImportActionPressed

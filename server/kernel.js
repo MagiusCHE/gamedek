@@ -266,12 +266,21 @@ const $this = {
         const args = Array.from(arguments)
         const providers = args.shift()
         const method = args.shift()
+        const ret = {
+            returns: {},
+            args: args
+        }
         for (const plugin_name in $this.clientOptions.plugins) {
             const plugin = $this.clientOptions.plugins[plugin_name]
             if (plugin && (await plugin.provides(providers)) && plugin[method]) {
-                await plugin[method].apply(plugin, args)
+                ret.returns[plugin_name] = await plugin[method].apply(plugin, args)
+                if (!ret.returns.first) {
+                    ret.returns.first = ret.returns[plugin_name]
+                }
+                ret.returns.last = ret.returns[plugin_name]
             }
         }
+        return ret
     },
     loadPlugin: async (plugin_name) => {
         log(`Activating plugin "${plugin_name}"...`);
@@ -314,21 +323,13 @@ const $this = {
         }
         return fs.writeFileSync(dest, value)
     },
-    broadcastPluginMethod: async function() {
-        const args = Array.from(arguments)
-        const providers = args.shift()
-        const method = args.shift()
-        for (const plugin_name in $this.clientOptions.plugins) {
-            const plugin = $this.clientOptions.plugins[plugin_name]
-            if (plugin && (await plugin.provides(providers)) && plugin[method]) {
-                await plugin[method].apply(plugin, args)
-            }
-        }
-    },
     translateBlock: async function(text) {
         const _args = { text: text }
         await $this.broadcastPluginMethod('localization', `translateBlock`, _args)
         return _args.text
+    },
+    showOpenDialog: async function(_args) {
+        return await dialog.showOpenDialog(_args)
     },
     /*provider: async function({ request, method, args }) {
 
@@ -408,18 +409,18 @@ const $this = {
 }
 
 const log = async function() {
-    return $this.logRawEx({
-        level: 'I',
-        sender: 'Kernel',
-        args: Array.from(arguments)
-    })
+    return $this.logRawEx(
+        'I',
+        'Kernel',
+        Array.from(arguments)
+    )
 }
 const logError = async function() {
-    return $this.logRawEx({
-        level: 'E', //error
-        sender: 'Kernel',
-        args: Array.from(arguments)
-    })
+    return $this.logRawEx(
+        'E', //error
+        'Kernel',
+        Array.from(arguments)
+    )
 }
 
 global.kernel = $this

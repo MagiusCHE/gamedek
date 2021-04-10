@@ -1,10 +1,20 @@
 {
     "en": {
         "ge_import_linux": "by Linux Executable",
-        "ge_import_linux_short": "Linux Executable"
+        "ge_import_linux_short": "Linux Executable",
+        "ge_il_info_tabexe": "Executable",
+        "ge_il_info_binary": "File to execute",
+        "ge_il_info_binary_flabel": "Executable file",
+        "ge_il_info_folder": "Working directory",
+        "ge_il_info_arguments": "Arguments"
     },
     "it": {
         "ge_import_linux": "un file Eseguibile Linux",
-        "ge_import_linux_short": "Eseguibile Linux"
+        "ge_import_linux_short": "Eseguibile Linux",
+        "ge_il_info_tabexe": "Percorso",
+        "ge_il_info_binary": "File eseguibile",
+        "ge_il_info_binary_flabel": "Eseguibile",
+        "ge_il_info_folder": "Directory di lavoro",
+        "ge_il_info_arguments": "Argomenti"
     }
 }

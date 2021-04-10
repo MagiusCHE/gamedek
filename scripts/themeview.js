@@ -6,9 +6,12 @@ class ThemeView {
     async init(control) {
         this.view = control
         const _this = this
+        _this.log('Begin load templates.')
         this.view.find('.template').each(function() {
+
             const id = $(this).attr('id')
-            const tpl = $(this).removeAttr(id).removeClass('template').get(0).outerHTML
+            _this.log('Loaded template', id)
+            const tpl = $(this).removeAttr('id').removeClass('template').get(0).outerHTML
             _this.#templates[id] = tpl
             $(this).remove()
         })

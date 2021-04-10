@@ -1,14 +1,22 @@
 ﻿<body>
     <div id="view-background"></div>
     <div id="app-view">
-        <h1>Gamedek</h1>
-        <div id="nogameinlist">
-            ${lang.nogameinlibrary_p1} <span style="font-size: 1.4rem;" title="${lang.addnewgame}" class="header-inline-icon material-icons-outlined d-inline-block mr-1 align-bottom" onclick="$('#gd-header [data-view=&quot;add&quot;]').click()">
-                add_to_queue
-            </span>
-            ${lang.nogameinlibrary_p2}
-        </div>
-        <div id="gamegrid">
-        </div>
+        <main class="container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>Gamedek</h1>
+                </div>
+                <div class="col-12">
+                    <div id="nogameinlist">
+                        ${lang.nogameinlibrary_p1} <span style="font-size: 1.4rem;" title="${lang.addnewgame}" class="header-inline-icon material-icons-outlined d-inline-block mr-1 align-bottom" onclick="$('#gd-header [data-view=&quot;add&quot;]').click()">
+                            add_to_queue
+                        </span>
+                        ${lang.nogameinlibrary_p2}
+                    </div>
+                    <div id="gamegrid">
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 </body>

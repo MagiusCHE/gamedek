@@ -9,6 +9,12 @@ class Theme_default extends Theme {
         await new Promise(resolve => {
             $('#app-view').animate({ opacity: 0 }, 300, resolve)
         })
+        for (const cnt of this.#activateToolTips) {
+            cnt.tooltip('dispose');
+        }
+        this.#activateToolTips.length = 0
+
+        //$('body #gd-view .tooltip').remove()
     }
     async prepareCurrentView() {
         await super.prepareCurrentView()
@@ -23,6 +29,11 @@ class Theme_default extends Theme {
         } else {
             $('#app-view').css({ opacity: 0 })
         }
+
+        await waitFor(() => $(document).tooltip)
+
+
+        await this.onNewElementAdded($('#gd-viewscontainer'))
     }
     async appearCurrentView() {
         super.appearCurrentView()
@@ -68,5 +79,49 @@ class Theme_default extends Theme {
     async hideGreatLoader() {
         $('body').removeClass('loading')
         $('#great-loader').animate({ opacity: 0 })
+    }
+
+    #activateToolTips = []
+    async onNewElementAdded(control) {
+        const _this = this
+        control = $(control)
+        await this.meOrChild(control, '[title]', cnt => {
+            cnt.tooltip()
+            this.#activateToolTips.push(cnt)
+        })
+    }
+    async meOrChild(control, selector, cb) {
+        control = $(control)
+        if (control.is(selector)) {
+            cb($(control))
+        }
+        control.find(selector).each(function() {
+            cb($(this))
+        })
+    }
+    async showDialog(options) {
+        return new Promise(async (resolve) => {
+            const modal = $(await this.translateBlock(await this.getTemplate('modal')))
+            modal.find('.modal-title').html(options.title)
+            modal.find('.modal-body').html(options.body)
+            if (options.understand) {
+                modal.find('.modal-footer').html(`<button type="button" class="btn btn-secondary" data-dismiss="modal">${await core.kernel.translateBlock('${lang.dialog_ok}')}</button>`)
+            }
+            $('body').append(modal)
+            if (options.onPreShow) {
+                await options.onPreShow()
+            }
+
+            modal.on('hide.bs.modal', async function(event) {
+                if (options.onPreHide) {
+                    await options.onPreHide()
+                }
+            })
+            modal.on('hidden.bs.modal', function(event) {
+                resolve(modal)
+            })
+
+            modal.modal('show')
+        })
     }
 }
