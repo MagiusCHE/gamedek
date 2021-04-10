@@ -97,7 +97,7 @@ body.loading #gd-view
 
 
 #gd-header #goback{
-    display: inline-block;
+    /*display: inline-block;*/
     opacity: 0;
     pointer-events: none;
     transform: scaleX(-1);
