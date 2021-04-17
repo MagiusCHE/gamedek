@@ -4,15 +4,18 @@
         view.find('#ge_save_changes').on('click', async () => {
             //collect info
             const reqs = this.#lastRequestedInfo
-            const setted = {}
+            const setted = {
+                props: {},
+                provider: this.#lastActionProvider
+            }
             for (const tabid in reqs.tabs) {
                 const tab = reqs.tabs[tabid]
-                setted[tabid] = {}
+                setted.props[tabid] = {}
                 for (const itemname in tab.items) {
                     const thisuid = `${tabid}_${itemname}`
                     const item = tab.items[itemname]
                     const value = $('#' + thisuid).val()
-                    setted[tabid][itemname] = value
+                    setted.props[tabid][itemname] = value
                     if (!value && item.required) {
                         await core.theme.showDialog({
                             title: await core.kernel.translateBlock('${lang.ge_com_info_required_title}'),
@@ -26,10 +29,16 @@
                 }
             }
 
-            const ret = (await core.kernel.broadcastPluginMethod('gameengine', `confirmNewGame`, setted, {})).returns.last
-            this.log(ret)
+            let response = await core.kernel.broadcastPluginMethod('gameengine', `confirmNewGameParams`, setted, {})
+            let ret = response.returns.last
+            this.log(response)
             if (!ret.error) {
-                //await core.kernel.broadcastPluginMethod('gameengine', `createNewGame`, setted)
+                
+                ret = (await core.kernel.broadcastPluginMethod('gameengine', `createNewGame`, response.args[0])).returns.last
+            }
+
+            if (!ret.error) {
+
                 core.theme.changeView('home')
             } else {
                 await core.theme.showDialog({
@@ -47,6 +56,7 @@
         })
     }
     #lastRequestedInfo
+    #lastActionProvider
     async onAppear() {
         const _this = this
         await super.onAppear()
@@ -59,7 +69,7 @@
         $('#goback').attr('onclick', "$('#gd-header [data-view=\"add\"]').click()")
 
         const reqs = (await core.kernel.broadcastPluginMethod('gameengine', `queryInfoForNewGame`, actionid, {})).returns.last
-
+        this.#lastActionProvider = actionid
         this.#lastRequestedInfo = reqs
 
         this.log(reqs)

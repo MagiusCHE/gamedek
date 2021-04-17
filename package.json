@@ -30,6 +30,7 @@
     "@electron/remote": "^1.0.4",
     "command-line-parser": "^0.1.10",
     "electron-default-menu": "^1.0.2",
+    "md5": "^2.3.0",
     "mkdirp": "^1.0.4",
     "platform-folders": "^0.5.2",
     "sprintf-js": "^1.1.2"

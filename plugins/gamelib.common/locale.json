@@ -6,11 +6,14 @@
         "ge_com_info_tabinfo_imgport": "Portrait",
         "ge_com_info_tabinfo_icon": "Icon",
         "ge_com_info_tabinfo_year": "Year",
+        "ge_com_info_tabinfo_tags": "Keywords",
         "ge_com_info_image_flabel": "Image",
         "ge_com_info_required_title": "Required field",
         "ge_com_info_required": "Field \"%s\" is required.",
         "ge_com_info_filenotfound_title": "Missing file",
-        "ge_com_info_filenotfound": "\"%s\" \"%s\" not exists of is not accessible."
+        "ge_com_info_filenotfound": "\"%s\" \"%s\" not exists of is not accessible.",
+        "ge_com_info_alreadyexists_title": "Already exists",
+        "ge_com_info_alreadyexists": "A game with this title+year already exists."
     },
     "it": {
         "ge_com_info_tabinfo": "Informazioni",
@@ -19,10 +22,13 @@
         "ge_com_info_tabinfo_imgport": "Icona grande",
         "ge_com_info_tabinfo_icon": "Icona piccola",
         "ge_com_info_tabinfo_year": "Anno",
+        "ge_com_info_tabinfo_tags": "Categorie",
         "ge_com_info_image_flabel": "Immagine",
         "ge_com_info_required_title": "Campo richiesto",
         "ge_com_info_required": "Il campo \"%s\" è obbligatorio.",
         "ge_com_info_filenotfound_title": "File mancante",
-        "ge_com_info_filenotfound": "\"%s\" \"%s\" non esiste o non è accessibile."
+        "ge_com_info_filenotfound": "\"%s\" \"%s\" non esiste o non è accessibile.",
+        "ge_com_info_alreadyexists_title": "Già esiste",
+        "ge_com_info_alreadyexists": "Esiste già un gioco con lo stesso titolo nello stesso anno."
     }
 }

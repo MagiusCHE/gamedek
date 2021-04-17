@@ -162,11 +162,31 @@ const $this = {
         }
         return undefined
     },
+    gameList_addNewGame: async function(info) {
+        return await $this.gameList.addNewGame(info)
+    },
     gameList_getImportActions: async function() {
         return await $this.gameList.getImportActions()
     },
     gameList_getGamesCount: async function() {
         return await $this.gameList.getGamesCount()
+    },
+    gamelist_getGameByHash: async function(hash) {
+        const games = await $this.gameList.getGames()
+        return games.find(g => g.hash == hash)
+    },
+    gameList_getGamesFiltered: async function(filters) {
+        const games = await $this.gameList.getGames()
+        const toret = []
+        games.forEach(g => {
+            //filter
+            toret.push(g)
+        })
+
+        return toret
+    },
+    gameList_getLastModifiedTimeStamp: async function() {
+        return await $this.gameList.getLastModifiedTimeStamp()
     },
     themeFullPath: undefined,
     getThemeUrl: async function(relativePath) {
@@ -236,8 +256,6 @@ const $this = {
         await $this.broadcastPluginMethod([], 'onApplicationStart', $this.clientOptions)
 
         $this.gameList = await $this.getProvider('gamelibrary')
-        log('Gamelibrary loaded')
-
         if (!$this.gameList) {
             throw new Error('Missing plugin provides "gamelibrary"')
         }

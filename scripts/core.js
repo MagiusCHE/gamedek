@@ -1308,6 +1308,7 @@
                     log(' Process is waiting for:', stringVariable_orCallback)
                     logError(pErr)
                     clearInterval(timer)
+                    $this.kernel.showWindow()
                     return;
                 }
                 let allok = false

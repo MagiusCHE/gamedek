@@ -1,15 +1,35 @@
+const fs = require('fs')
+const md5 = require('md5')
+const mkdirp = require('mkdirp')
+const path = require('path')
+
 class myplugin extends global.Plugin {
     constructor(root, manifest) {
         super(root, manifest)
     }
+    #mediapath
     async init() {
         await super.init()
+        this.#mediapath = path.join(kernel.appDataRoot, 'library', 'media')
+        mkdirp.sync(this.#mediapath)
     }
-    async confirmNewGame(tabs, returns) {
+    async libraryLoaded(library) {
+        library.games.forEach(g => {
+            if (!g.hash) {
+                g.hash = this.generateGameHash(g)
+                this.log(`Game "%s" has no hash. Recreate it = %s`, g.props.info.title, g.hash)
+            }            
+        })
+    }
+    generateGameHash(game) {
+        return md5(game.props.info.title + '§' + game.props.info.year)
+    }
+    async confirmNewGameParams(info, returns) {
+        const props = info.props
         if (returns.error) {
-            return
+            return returns
         }
-        if (!tabs.info.title) {
+        if (!props.info.title) {
             returns.error = {
                 title: await kernel.translateBlock('${lang.ge_com_info_required_title}'),
                 message: await kernel.translateBlock('${lang.ge_com_info_required "' + await kernel.translateBlock('${lang.ge_com_info_tabinfo_title}') + '"}'),
@@ -17,6 +37,46 @@ class myplugin extends global.Plugin {
             returns.tab = 'info'
             returns.item = 'title'
         }
+        if (!props.info.year) {
+            returns.error = {
+                title: await kernel.translateBlock('${lang.ge_com_info_required_title}'),
+                message: await kernel.translateBlock('${lang.ge_com_info_required "' + await kernel.translateBlock('${lang.ge_com_info_tabinfo_year}') + '"}'),
+            }
+            returns.tab = 'info'
+            returns.item = 'year'
+        }
+
+        const hash = this.generateGameHash(info)
+        const exists = await kernel.gamelist_getGameByHash(hash)
+
+        if (exists) {
+            returns.error = {
+                title: await kernel.translateBlock('${lang.ge_com_info_alreadyexists_title}'),
+                message: await kernel.translateBlock('${lang.ge_com_info_alreadyexists}'),
+            }
+            returns.tab = 'info'
+            returns.item = 'title'
+
+            return returns
+        }
+
+        info.hash = hash
+
+        //internalize images
+        const tointernalize = ['imagelandscape', 'imageportrait', 'icon']
+        const interalmediapath = path.join(this.#mediapath, hash)
+        mkdirp.sync(interalmediapath)
+        for (const toi of tointernalize) {
+            const src = path.resolve(props.info[toi])
+            if (src.indexOf(interalmediapath) == 0) {
+                continue
+            }
+            const dst = path.join(interalmediapath, toi + path.extname(src))
+
+            fs.copyFileSync(src, dst)
+            props.info[toi] = toi + path.extname(src)
+        }
+
         return returns
     }
     async queryInfoForNewGame(action, newargsinfo) {

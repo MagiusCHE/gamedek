@@ -27,12 +27,23 @@ class myplugin extends global.Plugin {
                 games: []
             }
         }
+        this.#library.lastUpdate = fs.statSync(this.#lib_path).mtime
+
+        await kernel.broadcastPluginMethod('gameengine', 'libraryLoaded', this.#library)
+
         this.log(`Loaded library (${this.#library.games.length} games).`)
     }
     async saveLibrary() {
         this.log(`Saving library (${this.#library.games.length} games)...`)
         fs.writeFileSync(this.#lib_path, JSON.stringify(this.#library))
+        this.#library.lastUpdate = fs.statSync(this.#lib_path).mtime
         this.log('Library saved.')
+    }
+    async addNewGame(info) {
+        this.log(`Adden new game`, info)
+        this.#library.games.push(info)
+        await this.saveLibrary()
+        return this.#library.games.length - 1
     }
     async getImportActions() {
         const actions = {}
@@ -41,6 +52,12 @@ class myplugin extends global.Plugin {
     }
     async getGamesCount() {
         return this.#library.games.length
+    }
+    async getLastModifiedTimeStamp() {
+        return this.#library.lastUpdate
+    }
+    async getGames() {
+        return this.#library.games
     }
     async onOnGuiAppearing() {
         this.log('Initialize. check libraries')
