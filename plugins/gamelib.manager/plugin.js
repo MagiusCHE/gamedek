@@ -27,7 +27,12 @@ class myplugin extends global.Plugin {
                 games: []
             }
         }
-        this.#library.lastUpdate = fs.statSync(this.#lib_path).mtime
+
+        if (fs.existsSync(this.#lib_path)) {
+            this.#library.lastUpdate = fs.statSync(this.#lib_path).mtime
+        } else {
+            this.#library.lastUpdate = new Date()
+        }
 
         await kernel.broadcastPluginMethod('gameengine', 'libraryLoaded', this.#library)
 

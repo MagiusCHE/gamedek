@@ -5,7 +5,7 @@
 (async () => {
 
     const $this = {
-        appVersion: '0.1a-1',
+        appVersion: '0.1a-2',
         changelog: {
             '0.1a': [
                 '07/03/2021: Initialization.',

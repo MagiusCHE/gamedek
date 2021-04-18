@@ -6,22 +6,24 @@
                 <div class="col-12">
                     <h1>Gamedek</h1>
                 </div>
-                <div class="col-12">
+                <div class="col-12 gamegridslider">
                     <div id="nogameinlist">
                         ${lang.nogameinlibrary_p1} <span style="font-size: 1.4rem;" title="${lang.addnewgame}" class="header-inline-icon material-icons-outlined d-inline-block mr-1 align-bottom" onclick="$('#gd-header [data-view=&quot;add&quot;]').click()">
                             add_to_queue
                         </span>
                         ${lang.nogameinlibrary_p2}
                     </div>
-                    <div id="gamegrid">
+                    <div id="gamegrid" class="portrait">
+                        <div class="slider">
+                        </div>
                         <div class="template gameitem" id="gamelist_item">
-                            <div class="landscape"></div>
-                            <div class="icon"></div>
-                            <div class="portrait"></div>
-                            <div class="title"></div>
-                            <div class="year"></div>
-                            <div class="desc"></div>
-                            <div class="tags"></div>
+                            <div class="frame">
+                                <div class="light"></div>
+                                <div class="imageportrait"></div>
+                                <div class="imagelandscape"></div>
+                                <div class="title"></div>
+                                <div class="desc"></div>
+                            </div>
                         </div>
                         <div class="template gametag" id="gamelist_item_tag">
                             <span class="text"></span>

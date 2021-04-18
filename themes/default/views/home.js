@@ -1,5 +1,11 @@
 ﻿class ThemeView_home extends ThemeView {
     #gameListLastModifiedTime
+    async init(w) {
+        await super.init(w)
+        if (!$('html').attr('data-gamelist-style')) {
+            $('html').attr('data-gamelist-style', 'block')
+        }
+    }
     async onAppear() {
         await super.onAppear()
         if (await core.kernel.gameList_getGamesCount() == 0) {
@@ -30,15 +36,30 @@
             return 0
         })
 
-        $('#gamegrid').empty()
+        $('#gamegrid .gameitem').remove()
         for (const gameinfo of games) {
+            //for (let h = 0; h < 100; h++) {
             const game = gameinfo.props
             const cnt = $(this.getTemplateHtml('gamelist_item'))
+
+            cnt.attr('data-hash', gameinfo.hash)
             cnt.find('.title').text(game.info.title)
             cnt.find('.year').text(game.info.year)
-            cnt.find('.landscape').css('background-image', game.info.imagelandscape)
-            cnt.find('.icon').css('background-image', game.info.icon)
-            cnt.find('.portrait').css('background-image', game.info.imageportrait)
+
+            if (game.info.icon) {
+                cnt.find('.icon').css('background-image', `url('${game.info.icon}')`)
+            }
+
+            if (game.info.imagelandscape) {
+                cnt.find('.imagelandscape').css('background-image', `url('${game.info.imagelandscape}')`)
+            } else if (game.info.imageportrait) {
+                cnt.find('.imagelandscape').css('background-image', `url('${game.info.imageportrait}')`)
+            }
+            if (game.info.imageportrait) {
+                cnt.find('.imageportrait').css('background-image', `url('${game.info.imageportrait}')`)
+            } else if (game.info.imagelandscape) {
+                cnt.find('.imageportrait').css('background-image', `url('${game.info.imagelandscape}')`)
+            }
             if (game.info.tags) {
                 for (const tag of game.info.tags) {
                     const tcnt = $(this.getTemplateHtml('gamelist_item_tag'))
@@ -49,6 +70,7 @@
             }
             core.theme.onNewElementAdded(cnt)
             $('#gamegrid').append(cnt)
+            //}
         }
     }
 }

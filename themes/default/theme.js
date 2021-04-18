@@ -99,6 +99,13 @@ class Theme_default extends Theme {
             cb($(this))
         })
     }
+    async setGridListView() {
+        $('html').attr('data-gamelist-style', 'list')
+    }
+    async cycleGridBlockView() {
+        $('html').attr('data-gamelist-style', 'block')
+        $('#gamegrid').toggleClass('portrait')
+    }
     async showDialog(options) {
         return new Promise(async (resolve) => {
             const modal = $(await this.translateBlock(await this.getTemplate('modal')))

@@ -2,6 +2,7 @@ const fs = require('fs')
 const md5 = require('md5')
 const mkdirp = require('mkdirp')
 const path = require('path')
+const rimraf = require('rimraf')
 
 class myplugin extends global.Plugin {
     constructor(root, manifest) {
@@ -14,12 +15,27 @@ class myplugin extends global.Plugin {
         mkdirp.sync(this.#mediapath)
     }
     async libraryLoaded(library) {
+
+        const dirs = fs.readdirSync(this.#mediapath)
+
         library.games.forEach(g => {
             if (!g.hash) {
                 g.hash = this.generateGameHash(g)
                 this.log(`Game "%s" has no hash. Recreate it = %s`, g.props.info.title, g.hash)
-            }            
+            }
+            const d = dirs.indexOf(g.hash)
+            if (d > -1) {
+                dirs.splice(d, 1)
+            }
         })
+
+        if (dirs.length > 0) {
+            this.log(`%s directories in %s will be removed due to missing game in library.`, dirs.length, this.#mediapath)
+            for (const rem of dirs) {
+                const dest = path.join(this.#mediapath, rem)
+                rimraf.sync(dest)
+            }
+        }
     }
     generateGameHash(game) {
         return md5(game.props.info.title + '§' + game.props.info.year)
@@ -65,19 +81,47 @@ class myplugin extends global.Plugin {
         //internalize images
         const tointernalize = ['imagelandscape', 'imageportrait', 'icon']
         const interalmediapath = path.join(this.#mediapath, hash)
-        mkdirp.sync(interalmediapath)
+
         for (const toi of tointernalize) {
-            const src = path.resolve(props.info[toi])
-            if (src.indexOf(interalmediapath) == 0) {
+            if (!props.info[toi]) {
                 continue
             }
-            const dst = path.join(interalmediapath, toi + path.extname(src))
+            if (!fs.existsSync(props.info[toi])) {
+                returns.error = {
+                    title: await kernel.translateBlock('${lang.ge_com_info_filenotfound_title}'),
+                    message: await kernel.translateBlock('${lang.ge_com_info_filenotfound "' + await kernel.translateBlock('${lang.ge_com_info_tabinfo_' + toi + '}') + '" "' + props.info[toi] + '"}'),
+                }
+                returns.tab = 'info'
+                returns.item = toi
 
+                return returns
+            }
+            if (props.info[toi].indexOf('@media://') == 0) {
+                continue
+            }
+            const src = path.resolve(props.info[toi])
+            const dst = path.join(interalmediapath, toi + path.extname(src))
+            mkdirp.sync(interalmediapath)
             fs.copyFileSync(src, dst)
-            props.info[toi] = toi + path.extname(src)
+            props.info[toi] = '@media://' + toi + path.extname(src)
         }
 
         return returns
+    }
+    async convertGameInfo(gameinfo) {
+        //in care we need to convert string jkson object into a valid datatype before passed to gui
+        // For example DATETIME or Media
+        const tointernalize = ['imagelandscape', 'imageportrait', 'icon']
+        const interalmediapath = path.join(this.#mediapath, gameinfo.hash)
+        const props = gameinfo.props
+        for (const toi of tointernalize) {
+            if (!props.info[toi]) {
+                continue
+            }
+            if (props.info[toi].indexOf('@media://') > -1) {
+                props.info[toi] = path.join(interalmediapath, props.info[toi].replace(/\@media:\/\//g, ''))
+            }
+        }
     }
     async queryInfoForNewGame(action, newargsinfo) {
         if (action.split('.')[0] != 'import') {
@@ -100,7 +144,8 @@ class myplugin extends global.Plugin {
                 },
                 imagelandscape: {
                     type: "image"
-                    , label: await kernel.translateBlock('${lang.ge_com_info_tabinfo_imgland}')
+                    , label: await kernel.translateBlock('${lang.ge_com_info_tabinfo_imagelandscape}')
+                    , note: await kernel.translateBlock('${lang.ge_com_info_tabinfo_imagelandscape_tip}')
                     , filters: [
                         {
                             name: await kernel.translateBlock('${lang.ge_com_info_image_flabel}')
@@ -110,7 +155,8 @@ class myplugin extends global.Plugin {
                 },
                 imageportrait: {
                     type: "image"
-                    , label: await kernel.translateBlock('${lang.ge_com_info_tabinfo_imgport}')
+                    , label: await kernel.translateBlock('${lang.ge_com_info_tabinfo_imageportrait}')
+                    , note: await kernel.translateBlock('${lang.ge_com_info_tabinfo_imageportrait_tip}')
                     , filters: [
                         {
                             name: await kernel.translateBlock('${lang.ge_com_info_image_flabel}')

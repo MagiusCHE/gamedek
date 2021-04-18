@@ -6,10 +6,10 @@
         <span data-view="add" title="${lang.addnewgame}" onclick="core.theme.changeView($(this).attr('data-view'))" class="icon material-icons-outlined d-inline-block mr-1">
             add_to_queue
         </span>
-        <span data-view="view_list" title="${lang.viewlist}" class="icon material-icons-outlined d-inline-block mr-1">
+        <span data-view="view_list" title="${lang.viewlist}" class="icon material-icons-outlined d-inline-block mr-1" onclick="core.theme.setGridListView()">
             reorder
         </span>
-        <span data-view="view_grid" title="${lang.viewblocks}" class="icon material-icons-outlined d-inline-block mr-1">
+        <span data-view="view_grid" title="${lang.viewblocks}" class="icon material-icons-outlined d-inline-block mr-1" onclick="core.theme.cycleGridBlockView()">
             dashboard
         </span>
         <span data-view="settings" title="${lang.settings}" onclick="core.theme.changeView($(this).attr('data-view'))" class="icon material-icons-outlined d-inline-block mr-1">

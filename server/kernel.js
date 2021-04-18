@@ -171,17 +171,21 @@ const $this = {
     gameList_getGamesCount: async function() {
         return await $this.gameList.getGamesCount()
     },
+    /// Game object will not be converted before returned
     gamelist_getGameByHash: async function(hash) {
         const games = await $this.gameList.getGames()
         return games.find(g => g.hash == hash)
     },
+    /// Game object will be converted before returned
     gameList_getGamesFiltered: async function(filters) {
         const games = await $this.gameList.getGames()
         const toret = []
-        games.forEach(g => {
+        for (const g of games) {
             //filter
-            toret.push(g)
-        })
+            const g2 = JSON.parse(JSON.stringify(g))
+            await $this.broadcastPluginMethod('gameengine', 'convertGameInfo', g2)
+            toret.push({ ...g2 })
+        }
 
         return toret
     },

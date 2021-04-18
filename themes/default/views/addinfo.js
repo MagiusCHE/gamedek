@@ -33,7 +33,7 @@
             let ret = response.returns.last
             this.log(response)
             if (!ret.error) {
-                
+
                 ret = (await core.kernel.broadcastPluginMethod('gameengine', `createNewGame`, response.args[0])).returns.last
             }
 
@@ -98,6 +98,7 @@
                 const cont = $(`<div class="form-group row" data-item="${thisuid}"></div>`)
                 const item = tab.items[itemname]
                 cont.append($(`<label class="col-sm-3 col-form-label" for="${thisuid}">${item.label}${item.required ? (' <span class="required">*</span>') : ''}</label>`))
+
                 let value
                 let browse = false
                 if (item.type == 'file') {
@@ -150,6 +151,15 @@
                     valuecont.append(browsebtn)
 
                 }
+
+                if (item.note) {
+                    value.on('focus', () => {
+                        $('.note').html(item.note)
+                    })
+                }
+                value.on('blur', () => {
+                    $('.note').empty()
+                })
                 cont.append(valuecont)
                 panel.append(cont)
             }
