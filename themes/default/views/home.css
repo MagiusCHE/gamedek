@@ -68,7 +68,7 @@
     z-index: 8;
     position: absolute;
     bottom: 0px;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     width: 100%;
     padding: 3px;
     text-align: center;
@@ -92,9 +92,7 @@
     height: 100%;
     position: absolute;
     opacity: 0.4;
-    /*background-size: 400% 400%;
-    background-origin: border-box;
-    background-position-y: -57px;*/
+    transform: scaleX(-1);
     transition: height ease-in-out 300ms;
 }
 
@@ -116,6 +114,39 @@
 
 [data-gamelist-style="block"] #gamegrid .gameitem:hover .light{
     height: 400%;
+}
+
+.row.game_dialog {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.game_dialog .col-info {
+    border-right: 1px solid #484646;
+    background-image: url('../media/def_imagelandscape.jpg');
+    background-size: cover;
+    background-position: 50% 0%;   
+    border-radius: 10px;
+    border: 1px solid #333;
+    box-shadow: 3px 3px 10px black;
+    min-height: 200px; 
+}
+
+.game_dialog .col-buttons{    
+}
+
+.game_dialog .col-buttons .icon{
+    filter: brightness(0.7);    
+    cursor: pointer;
+    transition: all ease-in-out 150ms;
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.game_dialog .col-buttons .icon:hover{
+    filter: brightness(1);
+    color:#71cefd;
+    transform: scale(1.1);
 }
 
 

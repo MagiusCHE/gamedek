@@ -1,4 +1,13 @@
 ﻿<body>
+    <div class="template row game_dialog" id="game_dialog">
+        <div class="col-11 col-info">
+            <div class="stats"></div>
+        </div>
+        <div class="col-1 col-buttons">
+            <span class="icon material-icons-outlined">not_started</span><br />
+            <span class="icon material-icons-outlined">edit</span>
+        </div>
+    </div>
     <div id="view-background"></div>
     <div id="app-view">
         <main class="container">
@@ -13,10 +22,10 @@
                         </span>
                         ${lang.nogameinlibrary_p2}
                     </div>
-                    <div id="gamegrid" class="portrait">
+                    <div id="gamegrid">
                         <div class="slider">
                         </div>
-                        <div class="template gameitem" id="gamelist_item">
+                        <div class="template gameitem" id="gamelist_item" onclick="core.theme.selectGame($(this).attr('data-hash'))">
                             <div class="frame">
                                 <div class="light"></div>
                                 <div class="imageportrait"></div>

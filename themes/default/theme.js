@@ -46,7 +46,9 @@ class Theme_default extends Theme {
 
         })
     }
-
+    async selectGame(hash) {
+        await this.getCurrentView()?.obj.selectGame(hash)
+    }
     async appearedCurrentView() {
         await super.appearedCurrentView()
         if (this.#firstAppear) {
@@ -106,11 +108,20 @@ class Theme_default extends Theme {
         $('html').attr('data-gamelist-style', 'block')
         $('#gamegrid').toggleClass('portrait')
     }
+
+    /* {
+        title
+        ,body
+        ,understand = add ok button
+        ,onPreShow
+        ,onPreHide
+        ,
+    } */
     async showDialog(options) {
         return new Promise(async (resolve) => {
             const modal = $(await this.translateBlock(await this.getTemplate('modal')))
-            modal.find('.modal-title').html(options.title)
-            modal.find('.modal-body').html(options.body)
+            modal.find('.modal-title').empty().append(options.title)
+            modal.find('.modal-body').empty().append(options.body)
             if (options.understand) {
                 modal.find('.modal-footer').html(`<button type="button" class="btn btn-secondary" data-dismiss="modal">${await core.kernel.translateBlock('${lang.dialog_ok}')}</button>`)
             }

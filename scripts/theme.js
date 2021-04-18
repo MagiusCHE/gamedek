@@ -233,10 +233,14 @@ class Theme {
         return this.#htmlpieces[id].html()
     }
     async onThemeAppeared() {
+
+        await this.registerNavigationEvents()
+
         await core.kernel.fireOnGuiAppearing()
         await this.appearCurrentView()
         await this.appearedCurrentView()
         await core.kernel.fireOnGuiAppeared()
+        await this.updateNavigableElements()
     }
     async changeView(pageid) {
         if (this.#visbilePageId == pageid) {
@@ -248,6 +252,7 @@ class Theme {
         await this.prepareCurrentView()
         await this.appearCurrentView()
         await this.appearedCurrentView()
+        await this.updateNavigableElements()
     }
     async hideCurrentView() {
         await this.getCurrentView()?.obj.onHide()
@@ -290,5 +295,37 @@ class Theme {
         const margs = Array.from(arguments)
         margs.unshift(`${this.constructor.name}: ${this.manifest.name}`)
         core.logError.apply(core, margs)
+    }
+
+    async registerNavigationEvents() {
+        $(document).on('keydown', ev => {
+            this.log('key pressed', ev.originalEvent.which)
+
+        })
+    }
+
+    #navElems
+    #actualElem
+    async updateNavigableElements() {
+        const nav = {}
+
+        $('[data-nav-group]').each(function() {
+            const group = $(this).attr('data-nav-group')
+            if (!nav[group]) {
+                nav[group] = []
+            }
+            nav[group] = $(`[data-nav-group="${group}"][data-nav-index]`)
+            nav[group].sort((a, b) => {
+                if ($(a).attr('tabindex') < $(b).attr('tabindex')) {
+                    return -1
+                }
+                if ($(a).attr('tabindex') > $(b).attr('tabindex')) {
+                    return 1
+                }
+                return 0
+            })
+        })
+
+        this.#navElems = nav
     }
 }

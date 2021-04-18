@@ -50,7 +50,7 @@ const $this = {
             startupConfig = require('../startupConfig')
             if (global.production) {
                 $this.appDataRoot = path.join(getPath('appData'), pjson.productName)
-                const appConfigFile = $this.appDataRoot + '/startupConfig.json'
+                const appConfigFile = $this.appDataRoot + '/config.json'
                 if (!fs.existsSync(appConfigFile)) {
                     fs.writeFileSync(appConfigFile, JSON.stringify(startupConfig, undefined, 2))
                 } else {
@@ -58,7 +58,6 @@ const $this = {
                 }
             } else {
                 $this.appDataRoot = path.resolve('./appData')
-                startupConfig = require('../startupConfig')
                 if (!fs.existsSync($this.appDataRoot)) {
                     mkdirp.sync($this.appDataRoot)
                 }
@@ -172,9 +171,15 @@ const $this = {
         return await $this.gameList.getGamesCount()
     },
     /// Game object will not be converted before returned
-    gamelist_getGameByHash: async function(hash) {
+    gamelist_getGameByHash: async function(hash, forGui) {
         const games = await $this.gameList.getGames()
-        return games.find(g => g.hash == hash)
+        const game = games.find(g => g.hash == hash)
+        if (forGui) {
+            const g2 = JSON.parse(JSON.stringify(game))
+            await $this.broadcastPluginMethod('gameengine', 'convertGameInfo', g2)
+            return g2
+        }
+        return game
     },
     /// Game object will be converted before returned
     gameList_getGamesFiltered: async function(filters) {
@@ -184,7 +189,7 @@ const $this = {
             //filter
             const g2 = JSON.parse(JSON.stringify(g))
             await $this.broadcastPluginMethod('gameengine', 'convertGameInfo', g2)
-            toret.push({ ...g2 })
+            toret.push(g2)
         }
 
         return toret

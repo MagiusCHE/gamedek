@@ -73,4 +73,21 @@
             //}
         }
     }
+    async selectGame(hash) {
+        const gameinfo = await core.kernel.gamelist_getGameByHash(hash, true)
+        //this.log(gameinfo)
+
+        const body = $(this.getTemplateHtml('game_dialog'))
+        const game = gameinfo.props
+        if (game.info.imagelandscape || game.info.imageportrait) {
+            body.find('.col-info').css('background-image', `url('${game.info.imagelandscape || game.info.imageportrait}')`)
+        }
+
+        //body.find('.col-info').
+
+        await core.theme.showDialog({
+            title: gameinfo.props.info.title
+            , body: body
+        })
+    }
 }
