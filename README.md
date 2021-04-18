@@ -1,6 +1,9 @@
 # GameDek
 Fancy themable panel to place all game links.
 
+![immagine](https://user-images.githubusercontent.com/46496052/115157495-e2256f80-a089-11eb-8f68-1637ddd34805.png)
+
+
 ## Credits
 - for Core:
   - https://jquery.com/
