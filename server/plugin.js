@@ -6,10 +6,11 @@ class Plugin {
         const classname = require(path.join(root, 'plugin.js'))
 
         const plugin = new classname(root, manifest)
+        if (await plugin.checkCapabilities()) {
+            await plugin.init()
 
-        await plugin.init()
-
-        return plugin
+            return plugin
+        }
     }
     #rootPath = undefined
     manifest = undefined
@@ -20,6 +21,13 @@ class Plugin {
     }
     pluginPath(relpath) {
         return path.resolve(path.join(this.#rootPath, relpath))
+    }
+    async checkCapabilities() {
+        if (this.manifest.os && this.manifest.os.indexOf(process.platform) == -1) {
+            this.log(` - Disabled due to OS incompatibility. Required: [${this.manifest.os.join(', ')}]`)
+            return false
+        }
+        return true
     }
     async onAllPluginsLoaded(plugins) {
 

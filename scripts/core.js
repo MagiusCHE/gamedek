@@ -366,6 +366,12 @@
                 $this.kernel.criticalError(err)
             }
         },
+        onKernelEvent: function(type, args) {
+            if (window.$) {
+                log('onKernelEvent', type)
+                $(document).trigger('kernel.' + type, args)
+            }
+        },
         boolEval: function(text) {
             try {
                 return eval(text) ? true : false

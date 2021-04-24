@@ -22,7 +22,7 @@ class ThemeView {
     async onBeginShow() {
 
     }
-    async onAppear() {
+    async onAppear(args) {
 
     }
     async onAppeared() {

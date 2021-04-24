@@ -22,6 +22,14 @@ for (const fun of allfu.split(' ')) {
     }
 }
 
+ipcRenderer.on('kernelEvent', (event, message) => {
+    //console.log('preload: Received kernelEvent', message, window.core ? true : false)
+    if (window.core) {
+        const args = JSON.parse(message)
+        core.onKernelEvent(args.type, args.args)
+    }
+})
+
 document.addEventListener('DOMContentLoaded', () => {
     var ga = document.createElement('script');
     ga.type = 'text/javascript';

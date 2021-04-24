@@ -25,18 +25,17 @@ class Theme_default extends Theme {
         }
         if (this.#firstAppear) {
             $('#gd-view').css({ opacity: 0 })
-            await this.showGreatLoader('initialization_pleasewait')
+            await this.showGreatLoader(await this.translateBlock('${lang.initialization_pleasewait}'))
         } else {
             $('#app-view').css({ opacity: 0 })
         }
 
         await waitFor(() => $(document).tooltip)
 
-
         await this.onNewElementAdded($('#gd-viewscontainer'))
     }
-    async appearCurrentView() {
-        super.appearCurrentView()
+    async appearCurrentView(args) {
+        super.appearCurrentView(args)
         await new Promise(resolve => {
             if (this.#firstAppear) {
                 $('#gd-view').animate({ opacity: 1 }, 600, resolve)
@@ -59,11 +58,16 @@ class Theme_default extends Theme {
 
     async onThemeAppeared() {
         await super.onThemeAppeared()
-        //const games = await core.kernel.gameList_getGamesCount();
     }
 
     async updateGreatLoader(message, target) {
         $('#great-loader .message ' + target).html(await this.translateBlock('${lang.' + message + '}'))
+    }
+    async showModalProgress(message) {
+        await this.showGreatLoader(message)
+    }
+    async hideModalProgress() {
+        await this.hideGreatLoader()
     }
     async showGreatLoader(message) {
         let loader = $('#great-loader')
@@ -72,7 +76,7 @@ class Theme_default extends Theme {
             $('body').append(loader)
         }
         if (message) {
-            $('#great-loader .message').html(await this.translateBlock('${lang.' + message + '}'))
+            $('#great-loader .message').html(message)
         }
         $('#great-loader').css('opacity', 0)
         $('body').addClass('loading')
@@ -127,16 +131,17 @@ class Theme_default extends Theme {
             }
             $('body').append(modal)
             if (options.onPreShow) {
-                await options.onPreShow()
+                await options.onPreShow(modal)
             }
 
             modal.on('hide.bs.modal', async function(event) {
                 if (options.onPreHide) {
-                    await options.onPreHide()
+                    await options.onPreHide(modal)
                 }
             })
             modal.on('hidden.bs.modal', function(event) {
                 resolve(modal)
+                modal.remove()
             })
 
             modal.modal('show')

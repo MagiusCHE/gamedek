@@ -4,27 +4,23 @@
             <div class="stats"></div>
         </div>
         <div class="col-1 col-buttons">
-            <span class="icon material-icons-outlined">not_started</span><br />
-            <span class="icon material-icons-outlined">edit</span>
+            <span class="icon material-icons-outlined btn-start">play_circle_outline</span>
+            <span class="icon material-icons-outlined btn-stop">stop_circle</span>
+            <span class="icon material-icons-outlined btn-edit" data-dismiss="modal">edit</span>
         </div>
     </div>
     <div id="view-background"></div>
     <div id="app-view">
         <main class="container">
             <div class="row">
-                <div class="col-12">
-                    <h1>Gamedek</h1>
-                </div>
                 <div class="col-12 gamegridslider">
-                    <div id="nogameinlist">
+                    <div id="nogameinlist" class="mt-4">
                         ${lang.nogameinlibrary_p1} <span style="font-size: 1.4rem;" title="${lang.addnewgame}" class="header-inline-icon material-icons-outlined d-inline-block mr-1 align-bottom" onclick="$('#gd-header [data-view=&quot;add&quot;]').click()">
                             add_to_queue
                         </span>
                         ${lang.nogameinlibrary_p2}
                     </div>
-                    <div id="gamegrid">
-                        <div class="slider">
-                        </div>
+                    <div id="gamegrid" class="mt-4">
                         <div class="template gameitem" id="gamelist_item" onclick="core.theme.selectGame($(this).attr('data-hash'))">
                             <div class="frame">
                                 <div class="light"></div>

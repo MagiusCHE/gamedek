@@ -1,6 +1,7 @@
 const fs = require("fs")
 const mkdirp = require('mkdirp');
 const path = require('path')
+const util = require('util')
 
 class myplugin extends global.Plugin {
     constructor(root, manifest) {
@@ -10,8 +11,10 @@ class myplugin extends global.Plugin {
     #root
     #lib_path
     #library
+    #lastLibraryStart
     async init() {
         await super.init()
+        this.#lastLibraryStart = new Date()
         this.#root = path.join(kernel.appDataRoot, 'library')
         this.#lib_path = path.join(this.#root, 'library.json')
         if (!fs.existsSync(this.#root)) {
@@ -38,14 +41,88 @@ class myplugin extends global.Plugin {
 
         this.log(`Loaded library (${this.#library.games.length} games).`)
     }
+    async setGameStartedByHash(hash) {
+        const exists = this.#library.games.find(g => g.hash == hash)
+        if (!exists) {
+            return
+        }
+        exists.lastStart = new Date()
+        this.saveLibrary()
+
+        kernel.sendEvent('onGameStatusChanged', hash)
+    }
+    async isGameStartedByHash(hash) {
+        const game = this.#library.games.find(g => g.hash == hash)
+        if (!game) {
+            return false
+        }
+        if (game.lastStop && typeof game.lastStop == 'string') {
+            game.lastStop = new Date(game.lastStop)
+        }
+        if (game.lastStart && typeof game.lastStart == 'string') {
+            game.lastStart = new Date(game.lastStart)
+        }
+        return (game.lastStart && this.#lastLibraryStart < game.lastStart && (!game.lastStop || game.lastStart > game.lastStop)) ? game.lastStart : undefined
+    }
+    async applicationExit() {
+        for (game of this.#library.games) {
+            if (game.lastStop && typeof game.lastStop == 'string') {
+                game.lastStop = new Date(game.lastStop)
+            }
+            if (game.lastStart && typeof game.lastStart == 'string') {
+                game.lastStart = new Date(game.lastStart)
+            }
+            if (game.lastStart && this.#lastLibraryStart < game.lastStart && (!game.lastStop || game.lastStart > game.lastStop)) {
+                const ela = game.lastStop - game.lastStart
+                game.playTime = (game.playTime || 0) + ela
+            }
+        }
+        this.saveLibrary()
+    }
+    async setGameStoppedByHash(hash, log) {
+        const exists = this.#library.games.find(g => g.hash == hash)
+        if (!exists) {
+            return
+        }
+        exists.lastStop = new Date()
+        if (exists.lastStart && typeof exists.lastStart == 'string') {
+            exists.lastStart = new Date(exists.lastStart)
+        }
+        if (exists.lastStart && this.#lastLibraryStart < exists.lastStart) {
+            const ela = exists.lastStop - exists.lastStart
+            exists.playTime = (exists.playTime || 0) + ela
+        }
+        exists.lastExecutionLog = log
+
+        this.saveLibrary()
+
+        kernel.sendEvent('onGameStatusChanged', hash)
+    }
     async saveLibrary() {
         this.log(`Saving library (${this.#library.games.length} games)...`)
         fs.writeFileSync(this.#lib_path, JSON.stringify(this.#library))
         this.#library.lastUpdate = fs.statSync(this.#lib_path).mtime
         this.log('Library saved.')
     }
+    async updateGame(info) {
+        const hash = info.prev_hash || info.hash
+        this.log(`Update game %o`, hash)
+        const exists = this.#library.games.find(g => g.hash == hash)
+        if (!exists) {
+            throw new Error(util.format(`Missing game with hash %o`, hash))
+        }
+        //clear existing props
+        for (const i in exists) {
+            delete exists[i]
+        }
+        for (const i in info) {
+            exists[i] = info[i]
+        }
+        delete exists.prev_hash
+        await this.saveLibrary()
+    }
     async addNewGame(info) {
-        this.log(`Adden new game`, info)
+        this.log(`Added new game`, info)
         this.#library.games.push(info)
         await this.saveLibrary()
         return this.#library.games.length - 1

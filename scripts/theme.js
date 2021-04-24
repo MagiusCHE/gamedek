@@ -182,9 +182,22 @@ class Theme {
         }
         await waitFor(() => blockstoload == 0)
 
+        $(document).on('kernel.showProgress', async (ev, args) => {
+            this.showModalProgress(args)
+        })
+        $(document).on('kernel.hideProgress', async (ev, args) => {
+            this.hideModalProgress()
+        })
+
         await this.setPage(this.manifest.entry)
 
         this.log('Loaded.')
+    }
+    async showModalProgress(args) {
+        $('body').css('pointer-events', 'none')
+    }
+    async hideModalProgress(args) {
+        $('body').css('pointer-events', '')
     }
     async themeUrl(relativePath) {
         if (await core.kernel.existsThemeFile(relativePath)) {
@@ -242,7 +255,7 @@ class Theme {
         await core.kernel.fireOnGuiAppeared()
         await this.updateNavigableElements()
     }
-    async changeView(pageid) {
+    async changeView(pageid, args) {
         if (this.#visbilePageId == pageid) {
             return
         }
@@ -250,7 +263,7 @@ class Theme {
         await this.setPage(pageid)
 
         await this.prepareCurrentView()
-        await this.appearCurrentView()
+        await this.appearCurrentView(args)
         await this.appearedCurrentView()
         await this.updateNavigableElements()
     }
@@ -273,8 +286,8 @@ class Theme {
         $('body #gd-viewscontainer').append(view)
         $('html').attr('data-gd-view', this.#visbilePageId)
     }
-    async appearCurrentView() {
-        await this.getCurrentView()?.obj.onAppear()
+    async appearCurrentView(args) {
+        await this.getCurrentView()?.obj.onAppear(args)
     }
     async appearedCurrentView() {
         await this.getCurrentView()?.obj.onAppeared()

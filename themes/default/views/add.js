@@ -1,5 +1,4 @@
 ﻿class ThemeView_add extends ThemeView {
-    #lastImportActionPressed
     async init(view) {
         await super.init(view)
         const actions = await core.kernel.gameList_getImportActions()
@@ -12,20 +11,16 @@
                 cnt.attr('data-action', actionid)
                 cnt.on('click', () => {
                     if (action.args) {
-                        const info = {}
-                        info[actionid] = action
-                        this.#lastImportActionPressed = info
-                        core.theme.changeView('addinfo')
+                        core.theme.changeView('addinfo', {
+                            provider: actionid
+                        })
                     } else {
                         core.kernel.pluginMethod(provider, 'onButtonClick', actionid)
                     }
-                })                
+                })
                 view.find('#importmethods_tbox').append(cnt)
                 await core.theme.onNewElementAdded(cnt)
             }
         }
-    }
-    getLastImportActionPressed() {
-        return this.#lastImportActionPressed
     }
 }

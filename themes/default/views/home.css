@@ -4,7 +4,6 @@
 
 #gamegrid {
     position: relative;
-    height: 87vh;
 }
 
 .gamegridslider{
@@ -141,12 +140,40 @@
     transition: all ease-in-out 150ms;
     font-size: 2rem;
     line-height: 1;
+    display: inline-block;
 }
 
 .game_dialog .col-buttons .icon:hover{
     filter: brightness(1);
     color:#71cefd;
     transform: scale(1.1);
+}
+
+.game_dialog .game-error{
+    word-break: break-word;
+    border: 1px solid #222;
+    background-color: #111;
+    padding: 1rem;
+    margin-top: 1rem;
+    max-height: 10rem;
+    overflow-y: auto;
+}
+
+.game_dialog .col-buttons .game-starting{
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+.game-running .col-buttons .btn-start{
+    display: none;
+}
+
+.game_dialog .col-buttons .btn-stop{
+    display: none
+}
+
+.modal.game-running .col-buttons .btn-stop{
+    display: inline-block;
 }
 
 

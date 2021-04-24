@@ -152,6 +152,9 @@ const $this = {
 
 
     },
+    getPath: (name) => {
+        return app.getPath(name)
+    },
     getProvider: async function(providers) {
         for (const plugin_name in $this.clientOptions.plugins) {
             const plugin = $this.clientOptions.plugins[plugin_name]
@@ -161,14 +164,26 @@ const $this = {
         }
         return undefined
     },
+    gameList_updateGame: async function(info) {
+        return await $this.gameList.updateGame(info)
+    },
     gameList_addNewGame: async function(info) {
         return await $this.gameList.addNewGame(info)
+    },
+    gameList_isGameStartedByHash: async function(hash) {
+        return await $this.gameList.isGameStartedByHash(hash);
     },
     gameList_getImportActions: async function() {
         return await $this.gameList.getImportActions()
     },
     gameList_getGamesCount: async function() {
         return await $this.gameList.getGamesCount()
+    },
+    startGameByHash: async function(hash) {
+        return await $this.broadcastPluginMethod('gameengine', 'startGameByHash', hash)
+    },
+    forceCloseGameByHash: async function(hash) {
+        return await $this.broadcastPluginMethod('gameengine', 'forceCloseGameByHash', hash)
     },
     /// Game object will not be converted before returned
     gamelist_getGameByHash: async function(hash, forGui) {
@@ -181,14 +196,33 @@ const $this = {
         }
         return game
     },
+    gameList_getGamesByProvider: async function(provider, convert) {
+        const games = await $this.gameList.getGames()
+        const toret = []
+        for (const g of games) {
+            if (g.provider != provider) {
+                continue
+            }
+            //filter
+            const g2 = JSON.parse(JSON.stringify(g))
+            if (convert) {
+                await $this.broadcastPluginMethod('gameengine', 'convertGameInfo', g2)
+            }
+            toret.push(g2)
+        }
+
+        return toret
+    },
     /// Game object will be converted before returned
-    gameList_getGamesFiltered: async function(filters) {
+    gameList_getGamesFiltered: async function(filters, convert) {
         const games = await $this.gameList.getGames()
         const toret = []
         for (const g of games) {
             //filter
             const g2 = JSON.parse(JSON.stringify(g))
-            await $this.broadcastPluginMethod('gameengine', 'convertGameInfo', g2)
+            if (convert) {
+                await $this.broadcastPluginMethod('gameengine', 'convertGameInfo', g2)
+            }
             toret.push(g2)
         }
 
@@ -319,14 +353,32 @@ const $this = {
             logError(`Plugin load error. Scanned dirs:`)
             logError(` - `, path.resolve(path.join($this.pluginsFullPath, plugin_name)))
             logError(` - `, path.resolve(path.join('.', 'plugins', plugin_name)))
-            throw new Error(`Missing plugin "${plugin_name}". App cannnot be started.`)
+            throw new Error(`Missing plugin "${plugin_name}". App cannnot start.`)
         }
         const manifest = path.join(fullPath, 'manifest.json')
-        const plugin = await Plugin.create(fullPath, manifest)
-        $this.clientOptions.plugins[plugin_name] = plugin
+        try {
+            const plugin = await Plugin.create(fullPath, manifest)
+            if (plugin) {
+                $this.clientOptions.plugins[plugin_name] = plugin
+            } else {
+                log(`Plugin "${plugin_name}" is now disabled.`)
+                $this.clientOptions.plugins[plugin_name] = false
+            }
+        } catch (err) {
+            logError(`Plugin load error:`, err)
+            throw new Error(`Error loading plugin "${plugin_name}". App cannnot start.`)
+        }
     },
     applicationExit: async () => {
+        await $this.broadcastPluginMethod([], `applicationExit`)
         $this.mainWindow.close();
+    },
+    sendEvent: (evtype, args) => {
+        log('Sending kernelEvent %o', evtype)
+        $this.mainWindow.webContents.send('kernelEvent', JSON.stringify({
+            type: evtype,
+            args: args
+        }))
     },
     showWindow: async () => {
         $this.mainWindow.show()

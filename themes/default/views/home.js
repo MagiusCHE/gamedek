@@ -5,9 +5,21 @@
         if (!$('html').attr('data-gamelist-style')) {
             $('html').attr('data-gamelist-style', 'block')
         }
+
+        $(document).on('kernel.onGameStatusChanged', async (ev, args) => {
+            this.log('Received kernel.onGameStatusChanged', args)
+            if (await core.kernel.gameList_isGameStartedByHash(args)) {
+                $(`[data-game-hash="${args}"]`).addClass('game-running')
+                $(`[data-game-hash="${args}"] .col-buttons .game-terminating`).removeClass('game-terminating')
+
+            } else {
+                $(`[data-game-hash="${args}"]`).removeClass('game-running')
+                $(`[data-game-hash="${args}"] .col-buttons .game-starting`).removeClass('game-starting')
+            }
+        })
     }
-    async onAppear() {
-        await super.onAppear()
+    async onAppear(args) {
+        await super.onAppear(args)
         if (await core.kernel.gameList_getGamesCount() == 0) {
             $('#nogameinlist').show();
             $('#gamegrid').hide();
@@ -24,7 +36,7 @@
             return
         }
         this.#gameListLastModifiedTime = lastMod
-        const games = await core.kernel.gameList_getGamesFiltered()
+        const games = await core.kernel.gameList_getGamesFiltered(undefined, true)
 
         games.sort((a, b) => {
             if (a.props.info.title?.toLowerCase() < b.props.info.title?.toLowerCase()) {
@@ -83,11 +95,52 @@
             body.find('.col-info').css('background-image', `url('${game.info.imagelandscape || game.info.imageportrait}')`)
         }
 
+        const gameisstarted = await core.kernel.gameList_isGameStartedByHash(gameinfo.hash)
+
+
+        body.find('.btn-edit').on('click', async () => {
+            core.theme.changeView('addinfo', gameinfo)
+        })
+
+        body.find('.btn-stop').on('click', async () => {
+            body.find('.btn-stop').addClass('game-terminating')
+            await core.kernel.forceCloseGameByHash(gameinfo.hash)
+        })
+
+
+        body.find('.btn-start').on('click', async (e) => {
+            body.find('.btn-start').addClass('game-starting')
+            const ret = (await core.kernel.startGameByHash(gameinfo.hash)).returns?.last
+            //
+            this.log(ret)
+            if (ret.error) {
+                body.find('.btn-start').removeClass('game-starting')
+                await core.theme.showDialog({
+                    title: ret.error.title,
+                    body: ret.error.message + '<p class="game-error text-danger">' + ret.exit.log + '</p>',
+                    understand: true
+                })
+
+            }
+            e.preventDefault()
+            return false
+        })
+
         //body.find('.col-info').
 
         await core.theme.showDialog({
             title: gameinfo.props.info.title
             , body: body
+            , onPreShow: (modal) => {
+                $(modal).attr('data-game-hash', gameinfo.hash)
+                $(modal).find(`.col-buttons .game-terminating`).removeClass('game-terminating')
+                $(modal).find(`.col-buttons .game-starting`).removeClass('game-starting')
+                if (gameisstarted) {
+                    $(modal).addClass('game-running')
+                } else {
+                    $(modal).removeClass('game-running')
+                }
+            }
         })
     }
 }

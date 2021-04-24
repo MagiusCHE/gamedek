@@ -40,7 +40,7 @@ class myplugin extends global.Plugin {
     generateGameHash(game) {
         return md5(game.props.info.title + '§' + game.props.info.year)
     }
-    async confirmNewGameParams(info, returns) {
+    async confirmGameParams(info, returns) {
         const props = info.props
         if (returns.error) {
             return returns
@@ -65,7 +65,7 @@ class myplugin extends global.Plugin {
         const hash = this.generateGameHash(info)
         const exists = await kernel.gamelist_getGameByHash(hash)
 
-        if (exists) {
+        if (info.prev_hash && hash != info.prev_hash && exists) {
             returns.error = {
                 title: await kernel.translateBlock('${lang.ge_com_info_alreadyexists_title}'),
                 message: await kernel.translateBlock('${lang.ge_com_info_alreadyexists}'),
@@ -74,16 +74,49 @@ class myplugin extends global.Plugin {
             returns.item = 'title'
 
             return returns
+        } else if (info.prev_hash && hash == info.prev_hash && !exists) {
+            returns.error = {
+                title: await kernel.translateBlock('${lang.ge_com_info_notexists_title}'),
+                message: await kernel.translateBlock('${lang.ge_com_info_notexists}'),
+            }
+            return returns
+        }
+        return returns
+    }
+    async updateGame(info, returns) {
+        return this.createNewGame(info, returns)
+    }
+    async createNewGame(info, returns) {
+        returns = returns || {}
+        const props = info.props
+        const hash = this.generateGameHash(info)
+
+        const interalmediapath = path.join(this.#mediapath, hash)
+        //internalize images
+        const tointernalize = ['imagelandscape', 'imageportrait', 'icon']
+
+        if (info.prev_hash && hash != info.prev_hash) {
+            const oripath = path.join(this.#mediapath, info.prev_hash)
+            if (fs.existsSync(oripath)) {
+                fs.renameSync(oripath, interalmediapath)
+                for (const toi of tointernalize) {
+                    if (!props.info[toi]) {
+                        continue
+                    }
+                    if (props.info[toi].indexOf(path.join(oripath, '/')) == 0) {
+                        props.info[toi] = '@media://' + toi + path.extname(props.info[toi])
+                    }
+                }
+            }            
         }
 
         info.hash = hash
 
-        //internalize images
-        const tointernalize = ['imagelandscape', 'imageportrait', 'icon']
-        const interalmediapath = path.join(this.#mediapath, hash)
-
         for (const toi of tointernalize) {
             if (!props.info[toi]) {
+                continue
+            }
+            if (props.info[toi].indexOf('@media://') == 0) {
                 continue
             }
             if (!fs.existsSync(props.info[toi])) {
@@ -96,13 +129,12 @@ class myplugin extends global.Plugin {
 
                 return returns
             }
-            if (props.info[toi].indexOf('@media://') == 0) {
-                continue
-            }
             const src = path.resolve(props.info[toi])
             const dst = path.join(interalmediapath, toi + path.extname(src))
-            mkdirp.sync(interalmediapath)
-            fs.copyFileSync(src, dst)
+            if (src != dst) {
+                mkdirp.sync(interalmediapath)
+                fs.copyFileSync(src, dst)
+            }
             props.info[toi] = '@media://' + toi + path.extname(src)
         }
 

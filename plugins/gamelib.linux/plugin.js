@@ -1,4 +1,8 @@
 const fs = require("fs")
+const mkdirp = require('mkdirp')
+const path = require('path')
+const rimraf = require('rimraf')
+const spawn = require("child_process").spawn;
 
 class myplugin extends global.Plugin {
     constructor(root, manifest) {
@@ -17,13 +21,133 @@ class myplugin extends global.Plugin {
             args: true
         }
     }
+    #activegames = {}
+    async forceCloseGameByHash(hash) {
+        if (this.#activegames[hash]) {
+            this.#activegames[hash].kill('SIGTERM')
+        }
+    }
+    async startGameByHash(hash, returns) {
+        returns = returns || {}
+        if (returns.handled) {
+            return returns
+        }
+        const games = await kernel.gameList.getGames()
+        const game = games.find(g => g.hash == hash)
+        if (!game) {
+            returns.error = {
+                title: await kernel.translateBlock('${lang.ge_com_info_filenotfound_title}'),
+                message: await kernel.translateBlock('${lang.ge_com_info_filenotfound "' + 'hash' + '" "' + hash + '"}'),
+            }
+            return returns
+        }
+
+        if (game.provider != 'import.linux') {
+            return returns
+        }
+
+        const err_title = await kernel.translateBlock('${lang.ge_com_execerror_title}')
+        const err_msg = await kernel.translateBlock('${lang.ge_com_execerror}')
+
+        return new Promise(async (resolve) => {
+
+            const tmpworkdir = game.props.executable.workdir && game.props.executable.workdir.length > 0 ? game.props.executable.workdir : path.dirname(game.props.executable.executable)
+            const log = []
+            const err = []
+            let startupFinalize = async (error) => {
+                startupFinalize = () => { }
+                if (error) {
+                    this.logError(error)
+                    delete this.#activegames[hash]
+                    await kernel.gameList.setGameStoppedByHash(hash, {
+                        error: error,
+                        std: log.join('\n'),
+                        stderr: err.join('\n')
+                    })
+                } else {
+                    await kernel.gameList.setGameStartedByHash(hash)
+                }
+                // Handle exit
+                returns.exit = {
+                    log: log.join('\n'),
+                    err: err.join('\n')
+                }
+
+                if (error) {
+                    returns.error = {
+                        title: err_title,
+                        message: err_msg
+                    }
+                }
+                resolve(returns)
+            }
+            let finalize = async (code) => {
+                finalize = () => { }
+                delete this.#activegames[hash]
+                await kernel.gameList.setGameStoppedByHash(hash, {
+                    code: code,
+                    std: log.join('\n'),
+                    stderr: err.join('\n')
+                })
+            }
+
+            const separatedargs = (game.props.executable.arguments && game.props.executable.arguments != "") ? game.props.executable.arguments.match(/"[^"]+"|'[^']+'|\S+/g) : []
+            //separatedargs = game.props.executable.arguments.split(' ')
+
+            let exec
+            try {
+                exec = spawn(
+                    game.props.executable.executable
+                    , separatedargs, {
+                    cwd: tmpworkdir,
+                    detached: true
+                }
+                );
+                this.#activegames[hash] = exec
+                startupFinalize()
+            } catch (er) {
+                startupFinalize(er)
+                return
+            }
+
+            exec.on('error', (er) => {
+                startupFinalize(er)
+            })
+
+            exec.stdout.on("data", (data) => {
+                log.push(data)
+            });
+
+            exec.stderr.on("data", (er) => {
+                // Handle error...
+                log.push(er)
+                err.push(er)
+            });
+
+            exec.on("exit", (code) => {
+                finalize(code)
+            });
+        })
+    }
+    async updateGame(info, returns) {
+        returns = returns || {}
+        if (info.provider != 'import.linux') {
+            return returns
+        }
+        if (returns.handled) {
+            return returns
+        }
+        await kernel.gameList_updateGame(info)
+
+        returns.handled = true
+
+        return returns
+    }
     async createNewGame(info, returns) {
         returns = returns || {}
         if (info.provider != 'import.linux') {
             return returns
         }
-        const tabs = info.tabs
-
         if (returns.handled) {
             return returns
         }
@@ -34,7 +158,7 @@ class myplugin extends global.Plugin {
 
         return returns
     }
-    async confirmNewGameParams(info, returns) {
+    async confirmGameParams(info, returns) {
         if (info.provider != 'import.linux') {
             return returns
         }

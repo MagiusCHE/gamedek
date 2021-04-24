@@ -1,10 +1,12 @@
 {
     "en": {
-        "ge_import_lutris": "by Lutris",
-        "ge_import_lutris_short": "Lutris game"
+        "ge_import_lutris": "sync via Lutris",
+        "ge_import_lutris_short": "Lutris game",
+        "ge_import_lutris_progress": "Syncing..."
     },
     "it": {
-        "ge_import_lutris": "da Lutris",
-        "ge_import_lutris_short": "Lutris"
+        "ge_import_lutris": "aggiorna da Lutris",
+        "ge_import_lutris_short": "Lutris",
+        "ge_import_lutris_progress": "Aggiornamento in corso..."
     }
 }

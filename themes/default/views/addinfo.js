@@ -29,12 +29,14 @@
                 }
             }
 
-            let response = await core.kernel.broadcastPluginMethod('gameengine', `confirmNewGameParams`, setted, {})
+            if (this.#lastEditHash) {
+                setted.prev_hash = this.#lastEditHash
+            }
+            let response = await core.kernel.broadcastPluginMethod('gameengine', `confirmGameParams`, setted, {})
             let ret = response.returns.last
             this.log(response)
             if (!ret.error) {
-
-                ret = (await core.kernel.broadcastPluginMethod('gameengine', `createNewGame`, response.args[0])).returns.last
+                ret = (await core.kernel.broadcastPluginMethod('gameengine', this.#lastEditHash ? `updateGame` : `createNewGame`, response.args[0])).returns.last
             }
 
             if (!ret.error) {
@@ -57,10 +59,14 @@
     }
     #lastRequestedInfo
     #lastActionProvider
-    async onAppear() {
+    #lastEditHash
+    async onAppear(args) {
         const _this = this
-        await super.onAppear()
-        const actioninfo = core.theme.getView('add').obj.getLastImportActionPressed()
+        await super.onAppear(args)
+
+        const actions = (await core.kernel.gameList_getImportActions())?.gameengine
+        const actioninfo = {}
+        actioninfo[args.provider] = actions[args.provider]
 
         const actionid = Object.keys(actioninfo)[0]
         const action = actioninfo[actionid]
@@ -71,8 +77,7 @@
         const reqs = (await core.kernel.broadcastPluginMethod('gameengine', `queryInfoForNewGame`, actionid, {})).returns.last
         this.#lastActionProvider = actionid
         this.#lastRequestedInfo = reqs
-
-        this.log(reqs)
+        this.#lastEditHash = args?.hash
 
         $('.nav-tabs').empty()
         $('.tab-content').empty()
@@ -93,6 +98,7 @@
 
 
             for (const itemname in tab.items) {
+                const existingvalue = (args.props && args.props[tabid] && args.props[tabid][itemname] !== undefined) ? args.props[tabid][itemname] : undefined
                 const thisuid = `${tabid}_${itemname}`
                 const valuecont = $(`<div class="valuecont col-sm-9"></div>`)
                 const cont = $(`<div class="form-group row" data-item="${thisuid}"></div>`)
@@ -114,6 +120,10 @@
                 } else if (item.type == 'text') {
                     value = $(`<input type="text" class="form-control-plaintext value" id="${thisuid}"/>`)
                     valuecont.append(value)
+
+                    if (existingvalue !== undefined) {
+                        value.val(existingvalue)
+                    }
                 } else if (item.type == 'image') {
                     browse = {
                         icon: 'insert_photo',
@@ -125,7 +135,9 @@
                         const opt = item.opts[optval]
                         const optcnt = $(`<option value="${optval}">${opt.title || opt}</option>`)
                         value.append(optcnt)
-                        if (opt.selected) {
+                        if (existingvalue !== undefined && optval == existingvalue) {
+                            optcnt.attr('selected', 'selected')
+                        } else if (opt.selected) {
                             optcnt.attr('selected', 'selected')
                         }
                     }
@@ -136,6 +148,9 @@
                     valuecont.addClass('filebrowser')
                     const browsebtn = $(`<span class="material-icons-outlined btn_browse" title="${await core.kernel.translateBlock('${lang.browse}')}">${browse.icon}</span>`)
                     value = $(`<input type="text" class="form-control-plaintext value" id="${thisuid}"/>`)
+                    if (existingvalue !== undefined) {
+                        value.val(existingvalue)
+                    }
                     browsebtn.on('click', function() {
                         core.kernel.showOpenDialog({
                             properties: [browse.prop]
