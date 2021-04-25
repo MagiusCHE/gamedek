@@ -2,11 +2,15 @@
     "en": {
         "ge_import_lutris": "sync via Lutris",
         "ge_import_lutris_short": "Lutris game",
-        "ge_import_lutris_progress": "Syncing..."
+        "ge_import_lutris_progress": "Syncing...",
+        "ge_import_lutris_report": "<p>Lutris sync is completed.</p>\n <p>Here the results:</p>\n<ul>  <li>%s new games</li>\n  <li>%s updated existing</li>\n  <li>%s skipped (check system log for more info)</li></ul>",
+        "ge_import_lutris_report_title": "Aggiornamento completato"
     },
     "it": {
         "ge_import_lutris": "aggiorna da Lutris",
         "ge_import_lutris_short": "Lutris",
-        "ge_import_lutris_progress": "Aggiornamento in corso..."
+        "ge_import_lutris_progress": "Aggiornamento in corso...",
+        "ge_import_lutris_report": "<p>L'aggiornamento della libreria di Lutris è stato completato con successo.</p>\n <p>Di seguito il riepilogo:</p>\n<ul>  <li>%s nuovi giochi importati</li>\n  <li>%s giochi aggiornati (perché già esistevano)</li>\n  <li>%s giochi non importati (controlla il log applicativo per i dettagli)</li></ul>",
+        "ge_import_lutris_report_title": "Aggiornamento completato"
     }
 }

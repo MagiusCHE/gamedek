@@ -16,6 +16,9 @@ class ThemeView {
             $(this).remove()
         })
     }
+    async gameUpdated(hash, oldhash) {
+        
+    }
     getTemplateHtml(id) {
         return this.#templates[id]
     }

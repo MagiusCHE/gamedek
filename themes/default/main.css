@@ -63,6 +63,7 @@ body.loading #gd-view
     left:50%;
     top: 30%;
     pointer-events: none;
+    z-index: 9999;
 }
 
 #great-loader .message {
@@ -227,6 +228,19 @@ select option {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #4aa7ffc9; 
+}
+
+.message-dialog-icon{
+    font-size: 1.7rem;
+    vertical-align: bottom;
+    line-height: 1;
+    margin-right: 6px;
+    display: inline-block;
+}
+
+.custom-switch,
+.custom-switch *{
+    cursor: pointer
 }
 
 #csscontroller #main_loaded {

@@ -69,17 +69,24 @@ class myplugin extends global.Plugin {
         return true
     }
     async getImportAction(actions) {
-        if (!actions['gameengine']) {
-            actions['gameengine'] = {}
-        }
-        actions['gameengine']['import.lutris'] = {
+        actions['import.lutris'] = {
+            provider: 'gameengine',
             button: await kernel.translateBlock('${lang.ge_import_lutris}'),
             short: await kernel.translateBlock('${lang.ge_import_lutris_short}'),
             args: false
         }
+        return actions
     }
-    async onButtonClick(action) {
-        if (action != 'import.lutris') {
+    async isGameEditableByHash(hash, returns) {
+        if (returns === false) {
+            return returns
+        }
+        const game = await kernel.gamelist_getGameByHash(hash)
+        returns = (game.provider != 'import.lutris')
+        return returns
+    }
+    async onButtonClick(button) {
+        if (button.id != 'import.lutris') {
             return
         }
         kernel.sendEvent('showProgress', await kernel.translateBlock('${lang.ge_import_lutris_progress}'))
@@ -98,17 +105,19 @@ class myplugin extends global.Plugin {
         this.log(results)
         //create entries or update existing
         const games = await kernel.gameList_getGamesByProvider('import.lutris')
-
+        let added = 0, updated = 0, skipped = 0
         for (const game of list) {
 
             const res = results.find(g => g.id == game.id)
 
             if (!res) {
+                this.logError(` - Skipped "${game.name}" due to missing sql entry`, ret.message)
                 continue
             }
             const yaml_path = path.join(this.#lutrisGamesCFGPath, res.configpath + '.yml')
             if (!fs.existsSync(yaml_path)) {
-                this.logError(` - Skipped "${res.name}" due to missing yaml config at "${yaml_path}".`)
+                this.logError(` - Skipped "${game.name}" due to missing yaml config at "${yaml_path}".`)
+                skipped++
                 continue
             }
 
@@ -138,7 +147,7 @@ class myplugin extends global.Plugin {
             newone.props.info.title = game.name
             newone.props.info.imagelandscape = banner
             newone.props.info.icon = icon
-            newone.props.info.year = '' + res.year
+            newone.props.info.year = res.year || new Date().getFullYear()
 
             let response = await kernel.broadcastPluginMethod('gameengine', `confirmGameParams`, newone, {})
             let ret = response.returns.last
@@ -153,11 +162,33 @@ class myplugin extends global.Plugin {
                         cfg.system.postexit_command = this.#pkillBin + ' lutris'
                         fs.writeFileSync(yaml_path, yaml.stringify(cfg))
                     }
+                    if (exists) {
+                        updated++
+                    } else {
+                        added++
+                    }
+                } else {
+                    this.logError(` - Skipped "${game.name}"`, ret)
+                    skipped++
                 }
+            } else {
+                this.logError(` - Skipped "${game.name}"`, ret)
+                skipped++
             }
         }
         kernel.sendEvent('hideProgress')
+        this.#lastImportResults = {
+            added: added,
+            skipped: skipped,
+            updated: updated
+        }
+        kernel.sendEvent('showMessage', {
+            title: await kernel.translateBlock('${lang.ge_import_lutris_report_title}')
+            , ishtml: true
+            , body: await kernel.translateBlock('${lang.ge_import_lutris_report ' + `${added} ${updated} ${skipped}` + '}')
+        })
     }
+    #lastImportResults
     async updateGame(info, returns) {
         returns = returns || {}
         if (info.provider != 'import.lutris') {

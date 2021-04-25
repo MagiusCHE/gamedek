@@ -64,9 +64,9 @@
         const _this = this
         await super.onAppear(args)
 
-        const actions = (await core.kernel.gameList_getImportActions())?.gameengine
+        const actions = (await core.kernel.gameList_getImportActions()).returns.last
         const actioninfo = {}
-        actioninfo[args.provider] = actions[args.provider]
+        actioninfo[args.actionid] = actions[args.actionid]
 
         const actionid = Object.keys(actioninfo)[0]
         const action = actioninfo[actionid]
@@ -83,7 +83,31 @@
         $('.tab-content').empty()
         this.#storedInfo = {}
 
+        const lastchar = "Z"
+        let maxorderlength = 1
         for (const tabid in reqs.tabs) {
+            reqs.tabs[tabid].order = reqs.tabs[tabid].order || lastchar
+            maxorderlength = Math.max(maxorderlength, reqs.tabs[tabid].order)
+        }
+        const sorted = []
+        for (const tabid in reqs.tabs) {
+            const miss = reqs.tabs[tabid].order.length
+            reqs.tabs[tabid].order += lastchar.repeat(maxorderlength - reqs.tabs[tabid].order.length)
+            sorted.push(tabid)
+        }
+        //preferredTabsOrder
+        sorted.sort((a, b) => {
+            if (reqs.tabs[a].order > reqs.tabs[b].order) {
+                return 1
+            }
+            if (reqs.tabs[a].order < reqs.tabs[b].order) {
+                return -1
+            }
+            return 0
+        })
+
+
+        for (const tabid of sorted) {
             const tab = reqs.tabs[tabid]
             const tabbtn = $(this.getTemplateHtml('tab_btn'))
             tabbtn.find('a').attr('id', 'tab-btn-' + tabid)
@@ -98,11 +122,12 @@
 
 
             for (const itemname in tab.items) {
-                const existingvalue = (args.props && args.props[tabid] && args.props[tabid][itemname] !== undefined) ? args.props[tabid][itemname] : undefined
+                const item = tab.items[itemname]
+                const existingvalue = (args.props && args.props[tabid] && args.props[tabid][itemname] !== undefined) ? args.props[tabid][itemname] : item.default
                 const thisuid = `${tabid}_${itemname}`
                 const valuecont = $(`<div class="valuecont col-sm-9"></div>`)
                 const cont = $(`<div class="form-group row" data-item="${thisuid}"></div>`)
-                const item = tab.items[itemname]
+
                 cont.append($(`<label class="col-sm-3 col-form-label" for="${thisuid}">${item.label}${item.required ? (' <span class="required">*</span>') : ''}</label>`))
 
                 let value
@@ -123,6 +148,31 @@
 
                     if (existingvalue !== undefined) {
                         value.val(existingvalue)
+                    }
+
+                } else if (item.type == 'activable') {
+                    const vcont2 = $(`<div class="custom-control custom-switch"></div>`)
+                    value = $(`<input type="checkbox" class="custom-control-input" id="${thisuid}">`)
+                    vcont2.append(value)
+                    vcont2.append(`<label class="custom-control-label" for="${thisuid}">${item.activable_text}</label>`)
+                    valuecont.append(vcont2)
+                    valuecont.addClass('pt-2')
+
+                    if (existingvalue !== undefined) {
+                        if (existingvalue === true) {
+                            value.attr('checked', 'checked')
+                        } else {
+                            value.removeAttr('checked')
+                        }
+                    }
+                } else if (item.type == 'bool') {
+                    value = $(`<input type="checkbox" class="form-control-plaintext value" value="1" id="${thisuid}"/>`)
+                    valuecont.append(value)
+
+                    if (existingvalue !== undefined) {
+                        if (existingvalue == "1" || existingvalue == 1 || existingvalue == true || existingvalue == "true") {
+                            value.attr('checked', 'checked')
+                        }
                     }
                 } else if (item.type == 'image') {
                     browse = {

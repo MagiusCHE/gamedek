@@ -173,6 +173,9 @@ const $this = {
     gameList_isGameStartedByHash: async function(hash) {
         return await $this.gameList.isGameStartedByHash(hash);
     },
+    gameList_isGameEditableByHash: async function(hash) {
+        return await $this.gameList.isGameEditableByHash(hash);
+    },
     gameList_getImportActions: async function() {
         return await $this.gameList.getImportActions()
     },
@@ -311,7 +314,7 @@ const $this = {
     fireOnGuiAppearing: async function() {
         await $this.broadcastPluginMethod([], 'onOnGuiAppearing')
     },
-    pluginMethod: async function() {
+    /*pluginMethod: async function() {
         const args = Array.from(arguments)
         const providers = args.shift()
         const method = args.shift()
@@ -322,7 +325,7 @@ const $this = {
             }
         }
         return undefined
-    },
+    },*/
     broadcastPluginMethod: async function() {
         const args = Array.from(arguments)
         const providers = args.shift()
@@ -331,14 +334,18 @@ const $this = {
             returns: {},
             args: args
         }
+
         for (const plugin_name in $this.clientOptions.plugins) {
             const plugin = $this.clientOptions.plugins[plugin_name]
             if (plugin && (await plugin.provides(providers)) && plugin[method]) {
-                ret.returns[plugin_name] = await plugin[method].apply(plugin, args)
-                if (!ret.returns.first) {
-                    ret.returns.first = ret.returns[plugin_name]
+                if (!ret.returns.all) {
+                    ret.returns.all = {}
                 }
-                ret.returns.last = ret.returns[plugin_name]
+                ret.returns.all[plugin_name] = await plugin[method].apply(plugin, args)
+                if (!ret.returns.first) {
+                    ret.returns.first = ret.returns.all[plugin_name]
+                }
+                ret.returns.last = ret.returns.all[plugin_name]
             }
         }
         return ret
@@ -357,7 +364,7 @@ const $this = {
         }
         const manifest = path.join(fullPath, 'manifest.json')
         try {
-            const plugin = await Plugin.create(fullPath, manifest)
+            const plugin = await Plugin.create(fullPath, plugin_name, manifest)
             if (plugin) {
                 $this.clientOptions.plugins[plugin_name] = plugin
             } else {
@@ -409,6 +416,9 @@ const $this = {
     },
     showOpenDialog: async function(_args) {
         return await dialog.showOpenDialog(_args)
+    },
+    showMessageBoxSync: async function(_args) {
+        dialog.showMessageBoxSync(_args)
     },
     /*provider: async function({ request, method, args }) {
 

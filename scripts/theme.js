@@ -188,10 +188,40 @@ class Theme {
         $(document).on('kernel.hideProgress', async (ev, args) => {
             this.hideModalProgress()
         })
+        $(document).on('kernel.closeAllDialogs', async (ev, args) => {
+            this.closeAllDialogs()
+        })
+        $(document).on('kernel.gameUpdated', async (ev, args) => {
+            this.gameUpdated(args.hash,args.oldhash)
+        })
+
+
+
+        $(document).on('kernel.showMessage', async (ev, args) => {
+            this.showMessage({
+                type: args.type,
+                title: args.title,
+                ishtml: args.ishtml,
+                message: args.body
+            })
+        })
 
         await this.setPage(this.manifest.entry)
 
         this.log('Loaded.')
+    }
+    async gameUpdated(hash,oldhash) {
+        //a game is updated
+    }
+    async closeAllDialogs() {
+        //need to be implemented by theme
+    }
+    async showMessage(args) {
+        if (args.ishtml) {
+            args.message = $(args.message).text()
+            args.title = $(args.title).text()
+        }
+        await core.kernel.showMessageBoxSync(args)
     }
     async showModalProgress(args) {
         $('body').css('pointer-events', 'none')

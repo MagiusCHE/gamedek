@@ -45,6 +45,28 @@ class Theme_default extends Theme {
 
         })
     }
+    async showMessage(args) {
+        const icon = $(`<span class="material-icons-outlined message-dialog-icon"></span>`)
+        switch (args.type) {
+            case 'error':
+                icon.text('error_outline').addClass('text-danger')
+                break;
+            case 'warning':
+                icon.text('report_problem').addClass('text-warning')
+                break;
+            default:
+                icon.text('feedback').addClass('text-info')
+                break;
+        }
+        this.showDialog({
+            title: icon.get(0).outerHTML + args.title,
+            body: args.message,
+            understand: true,
+        })
+    }
+    async gameUpdated(hash, oldhash) {
+        this.getCurrentView()?.obj?.gameUpdated(hash, oldhash)
+    }
     async selectGame(hash) {
         await this.getCurrentView()?.obj.selectGame(hash)
     }
@@ -112,7 +134,9 @@ class Theme_default extends Theme {
         $('html').attr('data-gamelist-style', 'block')
         $('#gamegrid').toggleClass('portrait')
     }
-
+    async closeAllDialogs() {
+        $('.modal').modal('hide');
+    }
     /* {
         title
         ,body
@@ -141,9 +165,10 @@ class Theme_default extends Theme {
             })
             modal.on('hidden.bs.modal', function(event) {
                 resolve(modal)
+                modal.modal('hide')
                 modal.remove()
             })
-
+            this.onNewElementAdded(modal)
             modal.modal('show')
         })
     }

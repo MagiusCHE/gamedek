@@ -51,39 +51,58 @@
         $('#gamegrid .gameitem').remove()
         for (const gameinfo of games) {
             //for (let h = 0; h < 100; h++) {
-            const game = gameinfo.props
-            const cnt = $(this.getTemplateHtml('gamelist_item'))
-
-            cnt.attr('data-hash', gameinfo.hash)
-            cnt.find('.title').text(game.info.title)
-            cnt.find('.year').text(game.info.year)
-
-            if (game.info.icon) {
-                cnt.find('.icon').css('background-image', `url('${game.info.icon}')`)
-            }
-
-            if (game.info.imagelandscape) {
-                cnt.find('.imagelandscape').css('background-image', `url('${game.info.imagelandscape}')`)
-            } else if (game.info.imageportrait) {
-                cnt.find('.imagelandscape').css('background-image', `url('${game.info.imageportrait}')`)
-            }
-            if (game.info.imageportrait) {
-                cnt.find('.imageportrait').css('background-image', `url('${game.info.imageportrait}')`)
-            } else if (game.info.imagelandscape) {
-                cnt.find('.imageportrait').css('background-image', `url('${game.info.imagelandscape}')`)
-            }
-            if (game.info.tags) {
-                for (const tag of game.info.tags) {
-                    const tcnt = $(this.getTemplateHtml('gamelist_item_tag'))
-                    tcnt.find('.text').text(tag.name)
-                    tcnt.css('color', tag.color)
-                    cnt.find('.tags').append(tcnt)
-                }
-            }
-            core.theme.onNewElementAdded(cnt)
-            $('#gamegrid').append(cnt)
-            //}
+            await this.updateGameCard(gameinfo)
         }
+    }
+    async gameUpdated(hash, oldhash) {
+        const gameinfo = await core.kernel.gamelist_getGameByHash(hash, true)
+        this.updateGameCard(gameinfo, oldhash)
+        //if selectdialog is open, close it!
+        $(`.modal[data-game-hash="${oldhash}"]`).modal('hide')
+    }
+    async updateGameCard(gameinfo, oldhash) {
+        const hash = oldhash || gameinfo.hash
+        let cnt = $(`[data-hash="${oldhash}"].gameitem`)
+
+        const newone = (cnt.length == 0)
+        if (newone) {
+            cnt = $(this.getTemplateHtml('gamelist_item'))
+        }
+        const game = gameinfo.props
+
+        cnt.attr('data-hash', gameinfo.hash)
+        cnt.find('.title').text(game.info.title)
+        cnt.find('.year').text(game.info.year)
+
+        if (game.info.icon) {
+            cnt.find('.icon').css('background-image', `url('${game.info.icon}')`)
+        }
+
+        if (game.info.imagelandscape) {
+            cnt.find('.imagelandscape').css('background-image', `url('${game.info.imagelandscape}?vt${new Date().getTime()}')`).removeClass('wasportrait')
+        } else if (game.info.imageportrait) {
+            cnt.find('.imagelandscape').css('background-image', `url('${game.info.imageportrait}?vt${new Date().getTime()}')`).addClass('wasportrait')
+        }
+        if (game.info.imageportrait) {
+            cnt.find('.imageportrait').css('background-image', `url('${game.info.imageportrait}?vt${new Date().getTime()}')`).removeClass('waslandscape')
+        } else if (game.info.imagelandscape) {
+            cnt.find('.imageportrait')
+                .css('background-image', `url('${game.info.imagelandscape}?vt${new Date().getTime()}')`)
+                .addClass('waslandscape')
+        }
+        if (game.info.tags) {
+            for (const tag of game.info.tags) {
+                const tcnt = $(this.getTemplateHtml('gamelist_item_tag'))
+                tcnt.find('.text').text(tag.name)
+                tcnt.css('color', tag.color)
+                cnt.find('.tags').append(tcnt)
+            }
+        }
+        core.theme.onNewElementAdded(cnt)
+        if (newone) {
+            $('#gamegrid').append(cnt)
+        }
+        //}
     }
     async selectGame(hash) {
         const gameinfo = await core.kernel.gamelist_getGameByHash(hash, true)
@@ -97,16 +116,40 @@
 
         const gameisstarted = await core.kernel.gameList_isGameStartedByHash(gameinfo.hash)
 
+        const otherbuttons = (await core.kernel.broadcastPluginMethod([], `queryButtonforGameDetails`, gameinfo.hash, {})).returns.last
 
-        body.find('.btn-edit').on('click', async () => {
-            core.theme.changeView('addinfo', gameinfo)
-        })
+        for (const btnname in otherbuttons) {
+            const butinfo = otherbuttons[btnname]
+            let iconbutton
+            if (butinfo.icon.indexOf('mi:') == 0) {
+                iconbutton = $(this.getTemplateHtml('game_dialog_button'))
+                iconbutton.attr('data-btn', btnname).text(butinfo.icon.substr(3))
+                    .attr('title', butinfo.title)
+                iconbutton.on('click', () => {
+                    core.kernel.broadcastPluginMethod(butinfo.provider, 'onButtonClick',
+                        {
+                            ...butinfo, ...{ id: btnname, actions: otherbuttons }
+                        }, gameinfo.hash)
+                })
+                body.find('.col-buttons').append(iconbutton)
+            } else {
+                throw new Error(`TODO: queryButtonforGameDetails button.icon!="mi:*" not implemented yet`)
+            }
+
+        }
+
+        if (!(await core.kernel.gameList_isGameEditableByHash(gameinfo.hash))) {
+            body.find('.btn-edit').hide()
+        } else {
+            body.find('.btn-edit').on('click', async () => {
+                core.theme.changeView('addinfo', gameinfo)
+            })
+        }
 
         body.find('.btn-stop').on('click', async () => {
             body.find('.btn-stop').addClass('game-terminating')
             await core.kernel.forceCloseGameByHash(gameinfo.hash)
         })
-
 
         body.find('.btn-start').on('click', async (e) => {
             body.find('.btn-start').addClass('game-starting')

@@ -12,14 +12,14 @@ class myplugin extends global.Plugin {
         await super.init()
     }
     async getImportAction(actions) {
-        if (!actions['gameengine']) {
-            actions['gameengine'] = {}
-        }
-        actions['gameengine']['import.linux'] = {
+        actions['import.linux'] = {
+            provider: 'gameengine',
             button: await kernel.translateBlock('${lang.ge_import_linux}'),
             short: await kernel.translateBlock('${lang.ge_import_linux_short}'),
             args: true
         }
+
+        return actions
     }
     #activegames = {}
     async forceCloseGameByHash(hash) {
@@ -196,7 +196,8 @@ class myplugin extends global.Plugin {
             newargsinfo.tabs = {}
         }
         newargsinfo.tabs.executable = {
-            title: await kernel.translateBlock('${lang.ge_il_info_tabexe}')
+            order: "1"
+            , title: await kernel.translateBlock('${lang.ge_il_info_tabexe}')
             , items: {
                 executable: {
                     type: "file"

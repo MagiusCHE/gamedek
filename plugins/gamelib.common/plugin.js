@@ -107,7 +107,7 @@ class myplugin extends global.Plugin {
                         props.info[toi] = '@media://' + toi + path.extname(props.info[toi])
                     }
                 }
-            }            
+            }
         }
 
         info.hash = hash
@@ -167,7 +167,8 @@ class myplugin extends global.Plugin {
         }
 
         newargsinfo.tabs.info = {
-            title: await kernel.translateBlock('${lang.ge_com_info_tabinfo}')
+            order: "0"
+            , title: await kernel.translateBlock('${lang.ge_com_info_tabinfo}')
             , items: {
                 title: {
                     type: "text"

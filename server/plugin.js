@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 class Plugin {
-    static async create(root, manifest) {
+    static async create(root, name, manifest) {
         const classname = require(path.join(root, 'plugin.js'))
 
         const plugin = new classname(root, manifest)
@@ -17,7 +17,7 @@ class Plugin {
     constructor(root, manifest) {
         this.#rootPath = root
         this.manifest = JSON.parse(fs.readFileSync(manifest).toString())
-        this.#name = this.manifest.simpleName || this.manifest.name.split('.').pop()
+        this.#name = this.manifest.simpleName || path.basename(root)
     }
     pluginPath(relpath) {
         return path.resolve(path.join(this.#rootPath, relpath))

@@ -19,7 +19,7 @@
     cursor: pointer;
     margin:5px;
     width: 16rem;
-    height: 9rem;
+    height: 7rem;
 }
 
 [data-gamelist-style="block"] #gamegrid.portrait .gameitem{
@@ -61,6 +61,13 @@
 ,[data-gamelist-style="block"] #gamegrid .gameitem .light{
     background-size: cover;
     background-position: 50% 0%;
+    background-repeat: no-repeat;
+}
+
+[data-gamelist-style="block"] #gamegrid .gameitem .imageportrait.waslandscape
+{
+    background-size: contain;
+    background-position: 50% 50%;    
 }
 
 [data-gamelist-style="block"] #gamegrid .gameitem .title{

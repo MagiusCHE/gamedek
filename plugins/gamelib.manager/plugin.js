@@ -51,6 +51,9 @@ class myplugin extends global.Plugin {
 
         kernel.sendEvent('onGameStatusChanged', hash)
     }
+    async isGameEditableByHash(hash) {
+        return (await kernel.broadcastPluginMethod('gameengine', 'isGameEditableByHash', hash)).returns.last
+    }
     async isGameStartedByHash(hash) {
         const game = this.#library.games.find(g => g.hash == hash)
         if (!game) {
@@ -65,7 +68,7 @@ class myplugin extends global.Plugin {
         return (game.lastStart && this.#lastLibraryStart < game.lastStart && (!game.lastStop || game.lastStart > game.lastStop)) ? game.lastStart : undefined
     }
     async applicationExit() {
-        for (game of this.#library.games) {
+        for (const game of this.#library.games) {
             if (game.lastStop && typeof game.lastStop == 'string') {
                 game.lastStop = new Date(game.lastStop)
             }
@@ -112,11 +115,13 @@ class myplugin extends global.Plugin {
             throw new Error(util.format(`Missing game with hash %o`, hash))
         }
         //clear existing props
-        for (const i in exists) {
-            delete exists[i]
-        }
-        for (const i in info) {
-            exists[i] = info[i]
+        if (exists != info) {
+            for (const i in exists) {
+                delete exists[i]
+            }
+            for (const i in info) {
+                exists[i] = info[i]
+            }
         }
         delete exists.prev_hash
         await this.saveLibrary()
@@ -129,8 +134,7 @@ class myplugin extends global.Plugin {
     }
     async getImportActions() {
         const actions = {}
-        await kernel.broadcastPluginMethod('gameengine', 'getImportAction', actions)
-        return actions
+        return await kernel.broadcastPluginMethod('gameengine', 'getImportAction', actions)
     }
     async getGamesCount() {
         return this.#library.games.length
