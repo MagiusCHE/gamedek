@@ -1,8 +1,13 @@
 # GameDek
-Fancy themable panel to place all game links.
+Fancy, themable, multilanguage, moddable panel to place all game links.
 
-![immagine](https://user-images.githubusercontent.com/46496052/115157495-e2256f80-a089-11eb-8f68-1637ddd34805.png)
+![immagine](https://user-images.githubusercontent.com/46496052/116122893-a1011100-a6c2-11eb-8446-49a992aec9ae.png)
 
+![immagine](https://user-images.githubusercontent.com/46496052/116122955-afe7c380-a6c2-11eb-974c-5875b0a21cd5.png)
+
+![immagine](https://user-images.githubusercontent.com/46496052/116123009-c0983980-a6c2-11eb-97e5-d92912836dee.png)
+
+![immagine](https://user-images.githubusercontent.com/46496052/116123083-dd347180-a6c2-11eb-9a1f-3872ddbf4155.png)
 
 ## Credits
 - for Core:
