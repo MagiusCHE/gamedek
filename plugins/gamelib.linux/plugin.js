@@ -185,7 +185,7 @@ class myplugin extends global.Plugin {
         }
         return returns
     }
-    async queryInfoForNewGame(action, newargsinfo) {
+    async queryInfoForGame(action, newargsinfo) {
         if (action != 'import.linux') {
             return
         }

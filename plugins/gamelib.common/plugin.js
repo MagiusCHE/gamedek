@@ -155,7 +155,7 @@ class myplugin extends global.Plugin {
             }
         }
     }
-    async queryInfoForNewGame(action, newargsinfo) {
+    async queryInfoForGame(action, newargsinfo) {
         if (action.split('.')[0] != 'import') {
             return
         }

@@ -34,7 +34,7 @@ class Theme_default extends Theme {
 
         await this.onNewElementAdded($('#gd-viewscontainer'))
     }
-    async appearCurrentView(args) {
+    async appearCurrentView(args) {        
         super.appearCurrentView(args)
         await new Promise(resolve => {
             if (this.#firstAppear) {

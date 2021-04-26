@@ -5,6 +5,6 @@
         "name": "Magius(CHE)",
         "email": "magiusche@magius.it"
     },
-    "repo": "https://github.com/MagiusCHE/gamedek-puglins-gamelib-common.git",
+    "repo": "https://github.com/MagiusCHE/gamedek-plugin-gamelib-common.git",
     "provides": "gameengine"
 }

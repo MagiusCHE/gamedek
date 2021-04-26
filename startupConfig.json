@@ -2,16 +2,17 @@
     "theme": "default",
     "plugins_comments": "Plugins order is very important! It affects the calling order of the broadcast methods.",
     "plugins": {
-        "gamelib.sis": true,
+        "gamelib.scraper": true,
         "gamelib.common": true,
         "gamelib.linux": true,
         "gamelib.lutris": true,
         "gamelib.manager": true,
+        "scraper.steam": true,
         "localization": true
     },
     "settings": {
         "plugins": {
-            "gamelib.sis": {}
+            "gamelib.scraper": {}
         }
     },
     "log": {

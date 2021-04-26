@@ -12,7 +12,7 @@
     </div>
     <div id="view-background"></div>
     <div id="app-view">
-        <main class="container">
+        <main id="grid_main">
             <div class="row">
                 <div class="col-12 gamegridslider">
                     <div id="nogameinlist" class="mt-4">
@@ -21,14 +21,16 @@
                         </span>
                         ${lang.nogameinlibrary_p2}
                     </div>
-                    <div id="gamegrid" class="mt-4">
-                        <div class="template gameitem" id="gamelist_item" onclick="core.theme.selectGame($(this).attr('data-hash'))">
-                            <div class="frame">
-                                <div class="light"></div>
-                                <div class="imageportrait"></div>
-                                <div class="imagelandscape"></div>
-                                <div class="title"></div>
-                                <div class="desc"></div>
+                    <div id="gamegrid" class="mt-4 text-center">
+                        <div class="text-left" id="gamegrid_centerer">
+                            <div class="template gameitem" id="gamelist_item" onclick="core.theme.selectGame($(this).attr('data-hash'))">
+                                <div class="frame">
+                                    <div class="light"></div>
+                                    <div class="imageportrait"></div>
+                                    <div class="imagelandscape"></div>
+                                    <div class="title"></div>
+                                    <div class="desc"></div>
+                                </div>
                             </div>
                         </div>
                         <div class="template gametag" id="gamelist_item_tag">

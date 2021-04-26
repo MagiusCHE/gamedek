@@ -12,7 +12,7 @@
             cnt.on('click', () => {
                 if (action.args) {
                     core.theme.changeView('addinfo', {
-                        actionid: actionid
+                        provider: actionid
                     })
                 } else {
                     core.kernel.broadcastPluginMethod(provider, 'onButtonClick', {

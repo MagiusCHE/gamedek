@@ -297,7 +297,7 @@ class Theme {
         await this.appearedCurrentView()
         await this.updateNavigableElements()
     }
-    async hideCurrentView() {
+    async hideCurrentView() {        
         await this.getCurrentView()?.obj.onHide()
     }
     getCurrentView() {

@@ -100,7 +100,7 @@
         }
         core.theme.onNewElementAdded(cnt)
         if (newone) {
-            $('#gamegrid').append(cnt)
+            $('#gamegrid #gamegrid_centerer').append(cnt)
         }
         //}
     }

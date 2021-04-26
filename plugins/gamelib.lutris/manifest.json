@@ -5,7 +5,7 @@
         "name": "Magius(CHE)",
         "email": "magiusche@magius.it"
     },
-    "repo": "https://github.com/MagiusCHE/gamedek-puglins-gamelib-lutris.git",
+    "repo": "https://github.com/MagiusCHE/gamedek-plugin-gamelib-lutris.git",
     "provides": "gameengine",
     "os": [
         "linux",

@@ -1,0 +1,12 @@
+{
+    "en": {
+        "sw_enable": " &raquo; Steam",
+        "sw_enable_text": "Enable for this game.",
+        "sw_enable_tip": "Force info and images retrieving from online Steam library, if present (require global scraper activation)."
+    },
+    "it": {
+        "sw_enable": " &raquo; Steam",
+        "sw_enable_text": "Abilita per questo gioco.",
+        "sw_enable_tip": "Le informazioni e le immagini verranno scaricate dalla libreria online di Steam ove possibile (richiede che sia attivata la ricerca globale)."
+    }
+}

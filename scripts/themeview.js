@@ -17,7 +17,7 @@ class ThemeView {
         })
     }
     async gameUpdated(hash, oldhash) {
-        
+
     }
     getTemplateHtml(id) {
         return this.#templates[id]
@@ -29,6 +29,9 @@ class ThemeView {
 
     }
     async onAppeared() {
+
+    }
+    async onHiding() {
 
     }
     async onHide() {

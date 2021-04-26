@@ -3,8 +3,7 @@
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url(MaterialIcons-Regular-Filled.woff2) format('woff2');
-  src: url(MaterialIcons-Regular-Filled.woff) format('woff');
+  src: url(MaterialIcons-Filled-Regular.woff2) format('woff2');
 }
 
 /* fallback */
@@ -12,11 +11,11 @@
   font-family: 'Material Icons Outlined';
   font-style: normal;
   font-weight: 400;
-  src: url(MaterialIcons-Regular-Outlined.woff2) format('woff2');
-  src: url(MaterialIcons-Regular-Outlined.woff) format('woff');
+  src: url(MaterialIcons-Outlined-Regular.woff2) format('woff2');
 }
 
-.material-icons {
+.material-icons,
+.material-icons-outlined {
   font-family: 'Material Icons';
   font-weight: normal;
   font-style: normal;
@@ -28,19 +27,10 @@
   white-space: nowrap;
   word-wrap: normal;
   direction: ltr;
-  
-  /* Support for all WebKit browsers. */
+  -webkit-font-feature-settings: 'liga';
   -webkit-font-smoothing: antialiased;
-  /* Support for Safari and Chrome. */
-  text-rendering: optimizeLegibility;
-
-  /* Support for Firefox. */
-  -moz-osx-font-smoothing: grayscale;
-
-  /* Support for IE. */
-  font-feature-settings: 'liga';
 }
-.material-icons-outlined{
+.material-icons-outlined {
   font-family: 'Material Icons Outlined' !important;
 }
 

@@ -14,8 +14,22 @@
                 for (const itemname in tab.items) {
                     const thisuid = `${tabid}_${itemname}`
                     const item = tab.items[itemname]
-                    const value = $('#' + thisuid).val()
-                    setted.props[tabid][itemname] = value
+                    let value
+                    if ($('#' + thisuid).is('input[type="checkbox"]')) {
+                        if ($('#' + thisuid).is(':checked')) {
+                            value = $('#' + thisuid).val()
+                        }
+                    } else {
+                        value = $('#' + thisuid).val()
+                    }
+                    if (value && ('' + value).trim() == '') {
+                        value = undefined
+                    }
+                    if (value !== undefined) {
+                        setted.props[tabid][itemname] = value
+                    } else {
+                        delete setted.props[tabid][itemname]
+                    }
                     if (!value && item.required) {
                         await core.theme.showDialog({
                             title: await core.kernel.translateBlock('${lang.ge_com_info_required_title}'),
@@ -64,9 +78,10 @@
         const _this = this
         await super.onAppear(args)
 
-        const actions = (await core.kernel.gameList_getImportActions()).returns.last
+        const response = await core.kernel.gameList_getImportActions()
+        const actions = response.returns.last
         const actioninfo = {}
-        actioninfo[args.actionid] = actions[args.actionid]
+        actioninfo[args.provider] = actions[args.provider]
 
         const actionid = Object.keys(actioninfo)[0]
         const action = actioninfo[actionid]
@@ -74,7 +89,7 @@
         $('#subtitle').html(action.short)
         $('#goback').attr('onclick', "$('#gd-header [data-view=\"add\"]').click()")
 
-        const reqs = (await core.kernel.broadcastPluginMethod('gameengine', `queryInfoForNewGame`, actionid, {})).returns.last
+        const reqs = (await core.kernel.broadcastPluginMethod('gameengine', `queryInfoForGame`, actionid, {})).returns.last
         this.#lastActionProvider = actionid
         this.#lastRequestedInfo = reqs
         this.#lastEditHash = args?.hash
@@ -160,9 +175,9 @@
 
                     if (existingvalue !== undefined) {
                         if (existingvalue === true) {
-                            value.attr('checked', 'checked')
+                            value.prop("checked", true);
                         } else {
-                            value.removeAttr('checked')
+                            value.prop("checked", false);
                         }
                     }
                 } else if (item.type == 'bool') {
