@@ -8,6 +8,7 @@
         "gamelib.lutris": true,
         "gamelib.manager": true,
         "scraper.steam": true,
+        "service.exec": true,
         "localization": true
     },
     "settings": {

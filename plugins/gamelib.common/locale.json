@@ -17,9 +17,7 @@
         "ge_com_info_alreadyexists_title": "Already exists",
         "ge_com_info_alreadyexists": "A game with this title+year already exists.",
         "ge_com_info_notexists_title": "Not exists",
-        "ge_com_info_notexists": "The game is not found in the library.",
-        "ge_com_execerror_title": "Execute error",
-        "ge_com_execerror": "Error while executing file. See details below:"
+        "ge_com_info_notexists": "The game is not found in the library."
     },
     "it": {
         "ge_com_info_tabinfo": "Informazioni",
@@ -39,8 +37,6 @@
         "ge_com_info_alreadyexists_title": "Già esiste",
         "ge_com_info_alreadyexists": "Esiste già un gioco con lo stesso titolo nello stesso anno.",
         "ge_com_info_notexists_title": "Non esiste",
-        "ge_com_info_notexists": "Non esiste questo gioco nella libreria.",
-        "ge_com_execerror_title": "Errore nell'esecuzione",
-        "ge_com_execerror": "Errore durante l'esecuzione dell'eseguibile del gioco. Di seguito i dettagli dell'errore:"
+        "ge_com_info_notexists": "Non esiste questo gioco nella libreria."
     }
 }

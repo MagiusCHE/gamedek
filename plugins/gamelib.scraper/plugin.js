@@ -103,13 +103,10 @@ class myplugin extends global.Plugin {
     async scrapeGameInfo(game) {
         game.props.scrape.enable = true
         kernel.sendEvent('showProgress', await kernel.translateBlock('${lang.ge_scrape_inprogress}'))
-        if (!game.props.scrape.steamid) {
-            //{"applist":{"apps"
-            await this.ensureDatabase()
+        await this.ensureDatabase()
 
-            //call scrapeGameInfo for every "SCRAPE ENABLED" plugin
-            game = (await kernel.broadcastPluginMethod('scraper-worker', `scrapeGameInfo`, game)).returns.last
-        }
+        //call scrapeGameInfo for every "SCRAPE ENABLED" plugin
+        game = (await kernel.broadcastPluginMethod('scraper-worker', `scrapeGameInfo`, game)).returns.last
 
         game.props.scrape.scraped = new Date()
         kernel.sendEvent('hideProgress')

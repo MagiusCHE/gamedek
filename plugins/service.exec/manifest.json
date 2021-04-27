@@ -1,0 +1,14 @@
+{
+    "name": "it.magius.gamedek.plugin.service.exec",
+    "version": "1.0.0",
+    "author": {
+        "name": "Magius(CHE)",
+        "email": "magiusche@magius.it"
+    },
+    "repo": "https://github.com/MagiusCHE/gamedek-plugin-service-exec.git",
+    "provides": "fileservice",
+    "os": [
+        "linux",
+        "win32"
+    ]
+}

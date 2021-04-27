@@ -11,105 +11,69 @@ class myplugin extends global.Plugin {
     async init() {
         await super.init()
     }
-    async getImportAction(actions) {
-        actions['import.linux'] = {
-            provider: 'gameengine',
-            button: await kernel.translateBlock('${lang.ge_import_linux}'),
-            short: await kernel.translateBlock('${lang.ge_import_linux_short}'),
-            args: true
+    #activebin = {}
+    async forceCloseBinByPid(pid, signal) {
+        this.log('forceCloseBinByPid: close process with pid %o', pid)
+        if (this.#activebin[pid]) {
+            this.#activebin[pid].process.kill(signal || 'SIGTERM')
         }
-
-        return actions
-    }
-    #activegames = {}
-    async binExecutonTerminated(pid) {
-        let hash
-        for (const thash in this.#activegames) {
-            if (this.#activegames[thash] == pid) {
-                hash = thash
-                break
+        return new Promise(async resolve => {
+            while (true) {
+                const ret = await this.getReturnsBinByPid(pid, true)
+                if (!this.#activebin[pid]) {
+                    this.log('forceCloseBinByPid: process %o is terminated', pid)
+                    resolve()
+                    return
+                }
+                await new Promise(r => setTimeout(r, 100))
             }
+        })
+    }
+    async getReturnsBinByPid(pid, purgeifexited) {
+        const ret = this.#activebin[pid]
+        if (purgeifexited && ret && ret?.returns?.exit?.code !== undefined) {
+            delete this.#activebin[pid]
         }
-        if (!hash) {
-            return
-        }
-
-        const ret = (await kernel.broadcastPluginMethod('fileservice', 'getReturnsBinByPid', pid, true)).returns.last
         if (!ret) {
             return
         }
-        await kernel.gameList.setGameStoppedByHash(hash, {
-            error: ret?.returns?.exit?.error,
-            std: ret?.returns?.exit?.log,
-            stderr: ret?.returns?.exit?.err
-        })
-    }
-    async forceCloseGameByHash(hash) {
-        const games = await kernel.gameList.getGames()
-        const game = games.find(g => g.hash == hash)
-        if (!game || game.provider != 'import.linux') {
-            return
+        return {
+            inputs: ret.inputs,
+            returns: ret.returns
         }
-
-        return kernel.broadcastPluginMethod('fileservice', 'forceCloseBinByPid', this.#activegames[hash])
     }
-    async startGameByHash(hash, returns) {
+    /*
+    executable: "/path to exec"
+    arguments: [] or "<spaces separated args>"
+    handled: if this executioon is already handled
+    
+    all others props will be copied into spawn options ( see: https://nodejs.org/api/child_process.html#child_process_child_process_spawn_command_args_options )
+    */
+    async spawnBinOrScript(args, returns) {
+        //args.cwd = args.cwd || 
         returns = returns || {}
         if (returns.handled) {
             return returns
         }
-        const games = await kernel.gameList.getGames()
-        const game = games.find(g => g.hash == hash)
-        if (!game) {
-            returns.error = {
-                title: await kernel.translateBlock('${lang.ge_com_info_filenotfound_title}'),
-                message: await kernel.translateBlock('${lang.ge_com_info_filenotfound "' + 'hash' + '" "' + hash + '"}'),
-            }
-            return returns
-        }
+        returns.handled = true
 
-        if (game.provider != 'import.linux') {
-            return returns
-        }
+        const err_title = await kernel.translateBlock('${lang.service_execerror_title}')
+        const err_msg = await kernel.translateBlock('${lang.service_execerror}')
 
-        const args = {
-            executable: game.props.executable.executable,
-            detached: true,
-            arguments: game.props.executable.arguments,
-            cwd: game.props.executable.workdir && game.props.executable.workdir.length > 0 ? game.props.executable.workdir : path.dirname(game.props.executable.executable)
-        }
-        const ret = (await kernel.broadcastPluginMethod('fileservice', 'spawnBinOrScript', args)).returns.last
-
-        if (ret.error) {
-            await kernel.gameList.setGameStoppedByHash(hash, {
-                error: ret.error,
-                std: log.join('\n'),
-                stderr: err.join('\n')
-            })
-        } else {
-            this.#activegames[hash] = ret.pid
-            await kernel.gameList.setGameStartedByHash(hash)
-        }
-
-        return returns
-        /*
-            const tmpworkdir = 
+        return new Promise(async (resolve) => {
             const log = []
             const err = []
-            let startupFinalize = async (error) => {
+            let startupFinalize = async (child, error) => {
+                const pid = child?.pid
                 startupFinalize = () => { }
                 if (error) {
+                    if (pid) {
+                        delete this.#activebin[pid]
+                    }
                     this.logError(error)
-                    delete this.#activegames[hash]
-                    await kernel.gameList.setGameStoppedByHash(hash, {
-                        error: error,
-                        std: log.join('\n'),
-                        stderr: err.join('\n')
-                    })
-                } else {
-                    await kernel.gameList.setGameStartedByHash(hash)
                 }
                 // Handle exit
+                returns.pid = pid
                 returns.exit = {
                     log: log.join('\n'),
                     err: err.join('\n')
@@ -121,39 +85,70 @@ class myplugin extends global.Plugin {
                         message: err_msg
                     }
                 }
+                if (pid) {
+                    this.#activebin[pid] =
+                    {
+                        process: child,
+                        returns: returns,
+                        inputs: args
+                    }
+                }
                 resolve(returns)
             }
-            let finalize = async (code) => {
+            let finalize = async (child, code) => {
+                const pid = child?.pid
                 finalize = () => { }
-                delete this.#activegames[hash]
-                await kernel.gameList.setGameStoppedByHash(hash, {
+
+                let error
+                if (code != 0) {
+                    error = new Error(`Error: process exited with code ${code}`)
+                    this.logError(error)
+                }
+
+                returns.pid = pid
+                returns.exit = {
                     code: code,
-                    std: log.join('\n'),
-                    stderr: err.join('\n')
-                })
+                    log: log.join('\n'),
+                    err: err.join('\n')
+                }
+
+                if (error) {
+                    returns.error = {
+                        title: err_title,
+                        message: err_msg
+                    }
+                }
+
+                this.#activebin[pid].returns = returns
+
+                await kernel.broadcastPluginMethod(undefined, 'binExecutonTerminated', pid)
+                kernel.sendEvent('binExecutonTerminated', pid)
             }
 
-            const separatedargs =
-                //separatedargs = game.props.executable.arguments.split(' ')
+            const separatedargs = (args.arguments && Array.isArray(args.arguments))
+                ? args.arguments
+                : (args.arguments != "" ? args.arguments.match(/"[^"]+"|'[^']+'|\S+/g) : [])
+            //separatedargs = game.props.executable.arguments.split(' ')
 
-                let exec
+            let exec
             try {
                 exec = spawn(
-                    game.props.executable.executable
-                    , separatedargs, {
-                    cwd: tmpworkdir,
-                    detached: true
-                }
+                    args.executable
+                    , separatedargs
+                    , {
+                        ...{
+                            detached: true
+                        }, ...args
+                    }
                 );
-                this.#activegames[hash] = exec
-                startupFinalize()
+                startupFinalize(exec)
             } catch (er) {
-                startupFinalize(er)
+                startupFinalize(exec, er)
                 return
             }
 
             exec.on('error', (er) => {
-                startupFinalize(er)
+                startupFinalize(exec, er)
             })
 
             exec.stdout.on("data", (data) => {
@@ -167,9 +162,9 @@ class myplugin extends global.Plugin {
             });
 
             exec.on("exit", (code) => {
-                finalize(code)
+                finalize(exec, (code === undefined || code === null) ? 0 : code)
             });
-        })*/
+        })
     }
     async updateGame(info, returns) {
         returns = returns || {}

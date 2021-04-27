@@ -59,7 +59,7 @@
         this.updateGameCard(gameinfo, oldhash)
         //if selectdialog is open, close it!
         $(`.modal[data-game-hash="${oldhash}"]`).modal('hide')
-    }
+    }    
     async updateGameCard(gameinfo, oldhash) {
         const hash = oldhash || gameinfo.hash
         let cnt = $(`[data-hash="${oldhash}"].gameitem`)
@@ -78,16 +78,19 @@
             cnt.find('.icon').css('background-image', `url('${game.info.icon}')`)
         }
 
-        if (game.info.imagelandscape) {
-            cnt.find('.imagelandscape').css('background-image', `url('${game.info.imagelandscape}?vt${new Date().getTime()}')`).removeClass('wasportrait')
-        } else if (game.info.imageportrait) {
-            cnt.find('.imagelandscape').css('background-image', `url('${game.info.imageportrait}?vt${new Date().getTime()}')`).addClass('wasportrait')
+        const imagelandscape = game.info.imagelandscape ? await core.kernel.getUrlbyGameHash(hash, game.info.imagelandscape) : undefined
+        const imageportrait = game.info.imageportrait ? await core.kernel.getUrlbyGameHash(hash, game.info.imageportrait) : undefined
+
+        if (imagelandscape) {
+            cnt.find('.imagelandscape').css('background-image', `url('${imagelandscape}}')`).removeClass('wasportrait')
+        } else if (imageportrait) {
+            cnt.find('.imagelandscape').css('background-image', `url('${imageportrait}}')`).addClass('wasportrait')
         }
-        if (game.info.imageportrait) {
-            cnt.find('.imageportrait').css('background-image', `url('${game.info.imageportrait}?vt${new Date().getTime()}')`).removeClass('waslandscape')
-        } else if (game.info.imagelandscape) {
+        if (imageportrait) {
+            cnt.find('.imageportrait').css('background-image', `url('${imageportrait}}')`).removeClass('waslandscape')
+        } else if (imagelandscape) {
             cnt.find('.imageportrait')
-                .css('background-image', `url('${game.info.imagelandscape}?vt${new Date().getTime()}')`)
+                .css('background-image', `url('${imagelandscape}}')`)
                 .addClass('waslandscape')
         }
         if (game.info.tags) {
@@ -110,13 +113,16 @@
 
         const body = $(this.getTemplateHtml('game_dialog'))
         const game = gameinfo.props
-        if (game.info.imagelandscape || game.info.imageportrait) {
-            body.find('.col-info').css('background-image', `url('${game.info.imagelandscape || game.info.imageportrait}')`)
+        const imagelandscape = game.info.imagelandscape ? await core.kernel.getUrlbyGameHash(hash, game.info.imagelandscape) : undefined
+        const imageportrait = game.info.imageportrait ? await core.kernel.getUrlbyGameHash(hash, game.info.imageportrait) : undefined
+
+        if (imagelandscape || imageportrait) {
+            body.find('.col-info').css('background-image', `url('${imagelandscape || imageportrait}')`)
         }
 
-        const gameisstarted = await core.kernel.gameList_isGameStartedByHash(gameinfo.hash)
+        const gameisstarted = await core.kernel.gameList_isGameStartedByHash(hash)
 
-        const otherbuttons = (await core.kernel.broadcastPluginMethod([], `queryButtonforGameDetails`, gameinfo.hash, {})).returns.last
+        const otherbuttons = (await core.kernel.broadcastPluginMethod([], `queryButtonforGameDetails`, hash, {})).returns.last
 
         for (const btnname in otherbuttons) {
             const butinfo = otherbuttons[btnname]
@@ -129,7 +135,7 @@
                     core.kernel.broadcastPluginMethod(butinfo.provider, 'onButtonClick',
                         {
                             ...butinfo, ...{ id: btnname, actions: otherbuttons }
-                        }, gameinfo.hash)
+                        }, hash)
                 })
                 body.find('.col-buttons').append(iconbutton)
             } else {
@@ -138,7 +144,7 @@
 
         }
 
-        if (!(await core.kernel.gameList_isGameEditableByHash(gameinfo.hash))) {
+        if (!(await core.kernel.gameList_isGameEditableByHash(hash))) {
             body.find('.btn-edit').hide()
         } else {
             body.find('.btn-edit').on('click', async () => {
@@ -148,12 +154,12 @@
 
         body.find('.btn-stop').on('click', async () => {
             body.find('.btn-stop').addClass('game-terminating')
-            await core.kernel.forceCloseGameByHash(gameinfo.hash)
+            await core.kernel.forceCloseGameByHash(hash)
         })
 
         body.find('.btn-start').on('click', async (e) => {
             body.find('.btn-start').addClass('game-starting')
-            const ret = (await core.kernel.startGameByHash(gameinfo.hash)).returns?.last
+            const ret = (await core.kernel.startGameByHash(hash)).returns?.last
             //
             this.log(ret)
             if (ret.error) {

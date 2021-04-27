@@ -52,7 +52,11 @@ class myplugin extends global.Plugin {
         kernel.sendEvent('onGameStatusChanged', hash)
     }
     async isGameEditableByHash(hash) {
-        return (await kernel.broadcastPluginMethod('gameengine', 'isGameEditableByHash', hash)).returns.last
+        const ret = (await kernel.broadcastPluginMethod('gameengine', 'isGameEditableByHash', hash)).returns.last
+        if (ret === undefined) {
+            return true
+        }
+        return ret
     }
     async isGameStartedByHash(hash) {
         const game = this.#library.games.find(g => g.hash == hash)

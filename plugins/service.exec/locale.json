@@ -1,0 +1,10 @@
+{
+    "en": {
+        "service_execerror_title": "Execute error",
+        "service_execerror": "Error while executing file. See details below:"
+    },
+    "it": {
+        "service_execerror_title": "Errore nell'esecuzione",
+        "service_execerror": "Errore durante l'esecuzione dell'eseguibile del gioco. Di seguito i dettagli dell'errore:"
+    }
+}

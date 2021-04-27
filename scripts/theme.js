@@ -182,6 +182,10 @@ class Theme {
         }
         await waitFor(() => blockstoload == 0)
 
+        $(document).on('kernel.allowHideProgress', async (ev, args) => {
+            this.allowHideProgress(args)
+        })
+        
         $(document).on('kernel.showProgress', async (ev, args) => {
             this.showModalProgress(args)
         })
@@ -194,7 +198,9 @@ class Theme {
         $(document).on('kernel.gameUpdated', async (ev, args) => {
             this.gameUpdated(args.hash,args.oldhash)
         })
-
+        $(document).on('kernel.methodExecuted', async (ev, args) => {
+            this.pluginMethodExecuted(args)
+        })
 
 
         $(document).on('kernel.showMessage', async (ev, args) => {
@@ -209,6 +215,17 @@ class Theme {
         await this.setPage(this.manifest.entry)
 
         this.log('Loaded.')
+    }
+    #_allowHideProgress = true
+    allowHideProgress(allow) {
+        if (allow !== undefined) {
+            //this.log('allowHideProgress', allow)
+            this.#_allowHideProgress = allow
+        }
+        return this.#_allowHideProgress
+    }
+    async pluginMethodExecuted(args) {
+        //a specific methos is executed
     }
     async gameUpdated(hash,oldhash) {
         //a game is updated
@@ -227,7 +244,9 @@ class Theme {
         $('body').css('pointer-events', 'none')
     }
     async hideModalProgress(args) {
-        $('body').css('pointer-events', '')
+        if (this.allowHideProgress()) {
+            $('body').css('pointer-events', '')
+        }
     }
     async themeUrl(relativePath) {
         if (await core.kernel.existsThemeFile(relativePath)) {

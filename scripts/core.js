@@ -368,7 +368,7 @@
         },
         onKernelEvent: function(type, args) {
             if (window.$) {
-                log('onKernelEvent', type)
+                //log('onKernelEvent', type)
                 $(document).trigger('kernel.' + type, args)
             }
         },

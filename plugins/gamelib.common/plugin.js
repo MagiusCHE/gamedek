@@ -3,6 +3,7 @@ const md5 = require('md5')
 const mkdirp = require('mkdirp')
 const path = require('path')
 const rimraf = require('rimraf')
+const Url = require('url');
 
 class myplugin extends global.Plugin {
     constructor(root, manifest) {
@@ -86,6 +87,41 @@ class myplugin extends global.Plugin {
     async updateGame(info, returns) {
         return this.createNewGame(info, returns)
     }
+    async getPsthbyGameHash(hash, returns) {
+        if (!returns) {
+            return returns
+        }
+        if (returns.handled) {
+            return returns
+        }
+        returns.handled = true
+
+        if (returns.path.indexOf('@media://') == 0) {
+            const safepath = Url.fileURLToPath(returns.path.replace(/\@media\:\/\//gm, `file://${process.platform != 'win32' ? '/' : ''}`))
+            returns.path = path.join(this.#mediapath, hash, safepath)
+        }
+        return returns
+    }
+    async getUrlbyGameHash(hash, returns) {
+        if (!returns) {
+            return returns
+        }
+        if (returns.handled) {
+            return returns
+        }
+        returns.handled = true
+
+        if (returns.path.indexOf('@media://') == 0) {
+            const safepath = Url.fileURLToPath(returns.path.replace(/\@media\:\/\//gm, `file://${process.platform != 'win32' ? '/' : ''}`))
+            const newpath = path.join(this.#mediapath, hash, safepath)
+            let qs = ''
+            if (fs.existsSync(newpath)) {
+                qs = '?vt=' + fs.statSync(newpath).mtime.getTime()
+            }
+            returns.url = Url.pathToFileURL(newpath) + qs
+        }
+        return returns
+    }
     async createNewGame(info, returns) {
         returns = returns || {}
         const props = info.props
@@ -141,6 +177,7 @@ class myplugin extends global.Plugin {
         return returns
     }
     async convertGameInfo(gameinfo) {
+        return
         //in care we need to convert string jkson object into a valid datatype before passed to gui
         // For example DATETIME or Media
         const tointernalize = ['imagelandscape', 'imageportrait', 'icon']

@@ -15,7 +15,10 @@
                     const thisuid = `${tabid}_${itemname}`
                     const item = tab.items[itemname]
                     let value
-                    if ($('#' + thisuid).is('input[type="checkbox"]')) {
+                    if (item.type == 'readonly') {
+                        value = item.default !== undefined ? item.default : $('#' + thisuid).val()
+                    }
+                    else if ($('#' + thisuid).is('input[type="checkbox"]')) {
                         if ($('#' + thisuid).is(':checked')) {
                             value = $('#' + thisuid).val()
                         }
@@ -159,6 +162,13 @@
                     }
                 } else if (item.type == 'text') {
                     value = $(`<input type="text" class="form-control-plaintext value" id="${thisuid}"/>`)
+                    valuecont.append(value)
+
+                    if (existingvalue !== undefined) {
+                        value.val(existingvalue)
+                    }
+                } else if (item.type == 'readonly') {
+                    value = $(`<input type="text" class="form-control-plaintext value" id="${thisuid}" disabled/>`)
                     valuecont.append(value)
 
                     if (existingvalue !== undefined) {

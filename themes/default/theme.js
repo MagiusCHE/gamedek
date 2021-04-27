@@ -34,7 +34,7 @@ class Theme_default extends Theme {
 
         await this.onNewElementAdded($('#gd-viewscontainer'))
     }
-    async appearCurrentView(args) {        
+    async appearCurrentView(args) {
         super.appearCurrentView(args)
         await new Promise(resolve => {
             if (this.#firstAppear) {
@@ -70,6 +70,9 @@ class Theme_default extends Theme {
     async selectGame(hash) {
         await this.getCurrentView()?.obj.selectGame(hash)
     }
+    async pluginMethodExecuted(args) {
+        await this.getCurrentView()?.obj.pluginMethodExecuted(args)
+    }
     async appearedCurrentView() {
         await super.appearedCurrentView()
         if (this.#firstAppear) {
@@ -89,7 +92,10 @@ class Theme_default extends Theme {
         await this.showGreatLoader(message)
     }
     async hideModalProgress() {
-        await this.hideGreatLoader()
+        if (this.allowHideProgress()) {
+            //this.log('hideModalProgress: allowHideProgress', this.allowHideProgress())
+            await this.hideGreatLoader()
+        }
     }
     async showGreatLoader(message) {
         let loader = $('#great-loader')
@@ -100,9 +106,11 @@ class Theme_default extends Theme {
         if (message) {
             $('#great-loader .message').html(message)
         }
-        $('#great-loader').css('opacity', 0)
-        $('body').addClass('loading')
-        $('#great-loader').animate({ opacity: 1 })
+        if (!$('body').is('.loading')) {
+            $('#great-loader').css('opacity', 0)
+            $('body').addClass('loading')
+            $('#great-loader').animate({ opacity: 1 })
+        }
     }
     async hideGreatLoader() {
         $('body').removeClass('loading')

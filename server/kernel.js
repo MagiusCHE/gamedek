@@ -152,6 +152,9 @@ const $this = {
 
 
     },
+    getUrlbyGameHash: async (hash, mpath) => {
+        return (await $this.broadcastPluginMethod('gameengine', 'getUrlbyGameHash', hash, { path: mpath })).returns.last.url
+    },
     getPath: (name) => {
         return app.getPath(name)
     },

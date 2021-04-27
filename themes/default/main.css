@@ -141,6 +141,10 @@ body.loading #gd-view
     display: none;
 }
 
+input:disabled{
+    opacity: 0.7;
+}
+
 /*a{
     color: #97e2ff;
 }
