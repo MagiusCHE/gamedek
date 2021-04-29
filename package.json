@@ -12,6 +12,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
+    "test": "echo success",
     "start": "electron . --develop",
     "prod": "electron .",
     "release": "electron-builder",
