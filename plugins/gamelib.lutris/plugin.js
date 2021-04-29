@@ -4,7 +4,6 @@ const path = require('path')
 const sqlite3 = require('sqlite3')
 const sqlite = require('sqlite')
 const yaml = require('yaml');
-const { getCreationTime } = require("process");
 
 class myplugin extends global.Plugin {
     constructor(root, manifest) {
@@ -79,15 +78,17 @@ class myplugin extends global.Plugin {
         return actions
     }
     async queryInfoForGame(action, newargsinfo) {
-        if (action != 'import.lutris') {
-            return
-        }
         if (!newargsinfo) {
             newargsinfo = {}
         }
         if (!newargsinfo.tabs) {
             newargsinfo.tabs = {}
         }
+        
+        if (action != 'import.lutris') {
+            return newargsinfo
+        }
+        
         newargsinfo.tabs.lutris = {
             order: "1"
             , title: await kernel.translateBlock('${lang.ge_lutris_tablu}')
@@ -182,14 +183,14 @@ class myplugin extends global.Plugin {
 
                     //verify 
                     if (newone.props.info.imagelandscape) {
-                        const rpath = (await kernel.broadcastPluginMethod(undefined, 'getPsthbyGameHash', newone.hash, { path: newone.props.info.imagelandscape })).returns.last.path
+                        const rpath = (await kernel.broadcastPluginMethod(undefined, 'getPathbyGameHash', newone.hash, { path: newone.props.info.imagelandscape })).returns.last.path
 
                         if (rpath && fs.statSync(rpath).mtime > fs.statSync(banner).mtime) {
                             banner = newone.props.info.imagelandscape
                         }
                     }
                     if (newone.props.info.icon) {
-                        const rpath = (await kernel.broadcastPluginMethod(undefined, 'getPsthbyGameHash', newone.hash, { path: newone.props.info.icon })).returns.last.path
+                        const rpath = (await kernel.broadcastPluginMethod(undefined, 'getPathbyGameHash', newone.hash, { path: newone.props.info.icon })).returns.last.path
 
                         if (rpath && fs.statSync(rpath).mtime > fs.statSync(icon).mtime) {
                             icon = newone.props.info.icon
@@ -235,7 +236,7 @@ class myplugin extends global.Plugin {
         this.#lastImportResults = {
             added: added,
             skipped: skipped,
-            updated: updated        
+            updated: updated
         }
         kernel.sendEvent('methodExecuted', {
             plugin: this.getName(),

@@ -23,7 +23,7 @@ class myplugin extends global.Plugin {
     }
 
     async ensureDatabase() {
-        const ret = (await kernel.broadcastPluginMethod('scraper', 'ensureFileByUrl', this.manifest.steam.fullListUrl)).returns.last
+        const ret = (await kernel.broadcastPluginMethod('curl', 'ensureFileByUrl', this.manifest.steam.fullListUrl)).returns.last
 
         if (ret.justDownloaded || !this.#fullList || Object.keys(this.#fullList).length == 0) {
             this.#fullList = ret.toJSON()
@@ -67,7 +67,7 @@ class myplugin extends global.Plugin {
     async ensureDownloadedImage(url, appid) {
         const header_url = url.replace(/<appid>/gm, appid)
 
-        return (await kernel.broadcastPluginMethod('scraper', 'ensureFileByUrl', header_url, '.jpg')).returns.last
+        return (await kernel.broadcastPluginMethod('curl', 'ensureFileByUrl', header_url, '.jpg')).returns.last
     }
     async queryScrapeInfoForGame(scraperitems) {
         scraperitems.steam = {

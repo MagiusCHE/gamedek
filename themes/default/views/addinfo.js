@@ -92,7 +92,8 @@
         $('#subtitle').html(action.short)
         $('#goback').attr('onclick', "$('#gd-header [data-view=\"add\"]').click()")
 
-        const reqs = (await core.kernel.broadcastPluginMethod('gameengine', `queryInfoForGame`, actionid, {})).returns.last
+        const rs = await core.kernel.broadcastPluginMethod('gameengine', `queryInfoForGame`, actionid, {})
+        const reqs = rs.returns.last
         this.#lastActionProvider = actionid
         this.#lastRequestedInfo = reqs
         this.#lastEditHash = args?.hash

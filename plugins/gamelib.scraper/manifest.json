@@ -6,7 +6,5 @@
         "email": "magiusche@magius.it"
     },
     "repo": "https://github.com/MagiusCHE/gamedek-plugin-gamelib-scraper.git",
-    "provides": "gameengine,scraper",
-    "cache_comment": "accepted metrics are m=minutes,h=hours,d=days",
-    "cacheExpire": "7d"
+    "provides": "gameengine,scraper"
 }

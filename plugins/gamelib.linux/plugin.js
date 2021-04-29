@@ -228,14 +228,14 @@ class myplugin extends global.Plugin {
         return returns
     }
     async queryInfoForGame(action, newargsinfo) {
-        if (action != 'import.linux') {
-            return
-        }
         if (!newargsinfo) {
             newargsinfo = {}
         }
         if (!newargsinfo.tabs) {
             newargsinfo.tabs = {}
+        }
+        if (action != 'import.linux') {
+            return newargsinfo
         }
         newargsinfo.tabs.executable = {
             order: "1"

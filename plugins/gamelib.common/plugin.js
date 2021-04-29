@@ -87,7 +87,7 @@ class myplugin extends global.Plugin {
     async updateGame(info, returns) {
         return this.createNewGame(info, returns)
     }
-    async getPsthbyGameHash(hash, returns) {
+    async getPathbyGameHash(hash, returns) {
         if (!returns) {
             return returns
         }
