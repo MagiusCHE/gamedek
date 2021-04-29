@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/MagiusCHE/gamedek.svg?branch=prod)](https://travis-ci.org/MagiusCHE/gamedek)
+
 # GameDek
 Fancy, themable, multilanguage, moddable panel to place all game links.
 
