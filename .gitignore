@@ -3,3 +3,4 @@ package-json.lock
 *.log
 node_modules
 /appData
+/GameDek-linux-x64

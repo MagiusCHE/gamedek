@@ -190,6 +190,23 @@
     padding-right: 3rem;
 }
 
+.gameitem .playicon{
+    position: absolute;
+    pointer-events: none;    
+    z-index: 9;
+    background-color: #000000a8;
+    border-radius: 10px;
+    top: 4px;
+    left: 4px;
+    display: none;
+}
+
+.gameitem.started .playicon{
+    display: inline-block;
+    pointer-events: all;
+    cursor: pointer;    
+}
+
 
 #csscontroller #home_loaded {
     width: 100px;

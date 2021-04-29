@@ -2,12 +2,14 @@ const childProcess = require("child_process");
 const fs = require('fs')
 const path = require('path')
 const vdf = require('node-vdf')
+const ps = require('ps-node')
 
 class myplugin extends global.Plugin {
     constructor(root, manifest) {
         super(root, manifest)
     }
     #steamBin
+    #killBin
     async init() {
         await super.init()
     }
@@ -27,6 +29,11 @@ class myplugin extends global.Plugin {
         }
         //verify if lutris existsù
         this.#steamBin = await pwhich('steam')
+        if (process.platform == 'linux') {
+            this.#killBin = await pwhich('kill')
+        } else {
+            this.#killBin = 'Taskkill'
+        }
         if (!this.#steamBin) {
             this.logError(` - Steam is not installed. Binary cannot be found.`)
             return false
@@ -289,11 +296,43 @@ class myplugin extends global.Plugin {
     async forceCloseGameByHash(hash) {
         const games = await kernel.gameList.getGames()
         const game = games.find(g => g.hash == hash)
-        if (!game || game.provider != 'import.lutris') {
+        if (!game || game.provider != 'import.steam') {
             return
         }
 
-        return kernel.broadcastPluginMethod('fileservice', 'forceCloseBinByPid', this.#activegames[hash], 'SIGHUP')
+        //steam://ExitSteam
+        let args = {
+            executable: this.#steamBin,
+            detached: true,
+            arguments: ['-silent', 'steam://ExitSteam']
+        }
+        const ret = (await kernel.broadcastPluginMethod('fileservice', 'spawnBinOrScript', args)).returns.last
+
+        await new Promise((resolve) => {
+            ps.lookup({
+                command: 'steam'
+            }, async (err, resultList) => {
+                if (err) {
+                    throw new Error(err);
+                }
+                for (const process of resultList) {
+                    if (process) {
+
+                        this.log('Kill PID: %s, COMMAND: %s, ARGUMENTS: %s', process.pid, process.command, process.arguments);
+
+                        args = {
+                            executable: this.#killBin,
+                            detached: true,
+                            arguments: process.platform == 'linux' ? ['-s', 'SIGHUP', process.pid] : ['/PID', process.pid, '/F']
+                        }
+                        await kernel.broadcastPluginMethod('fileservice', 'spawnBinOrScript', args)
+                    }
+                }
+                resolve()
+            })
+        })
+
+        return kernel.broadcastPluginMethod('fileservice', 'forceCloseBinByPid', this.#activegames[hash])
     }
     async startGameByHash(hash, returns) {
         returns = returns || {}
@@ -310,14 +349,14 @@ class myplugin extends global.Plugin {
             return returns
         }
 
-        if (game.provider != 'import.lutris') {
+        if (game.provider != 'import.steam') {
             return returns
         }
 
         const args = {
             executable: this.#steamBin,
             detached: true,
-            arguments: 'lutris:rungameid/' + game.props.lutris.id
+            arguments: ['-silent', 'steam://rungameid/' + game.props.steam.appid]
         }
         const ret = (await kernel.broadcastPluginMethod('fileservice', 'spawnBinOrScript', args)).returns.last
 

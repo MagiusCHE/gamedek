@@ -8,13 +8,16 @@
 
         $(document).on('kernel.onGameStatusChanged', async (ev, args) => {
             this.log('Received kernel.onGameStatusChanged', args)
+            const dialog = $(`[data-game-hash="${args}"]`)
+            const card = $(`.gameitem[data-hash="${args}"]`)
             if (await core.kernel.gameList_isGameStartedByHash(args)) {
-                $(`[data-game-hash="${args}"]`).addClass('game-running')
-                $(`[data-game-hash="${args}"] .col-buttons .game-terminating`).removeClass('game-terminating')
-
+                dialog.addClass('game-running')
+                dialog.find(`.col-buttons .game-terminating`).removeClass('game-terminating')
+                card.addClass(`started`)
             } else {
-                $(`[data-game-hash="${args}"]`).removeClass('game-running')
-                $(`[data-game-hash="${args}"] .col-buttons .game-starting`).removeClass('game-starting')
+                dialog.removeClass('game-running')
+                dialog.find(`.col-buttons .game-starting`).removeClass('game-starting')
+                card.removeClass(`started`)
             }
         })
     }
@@ -59,7 +62,7 @@
         this.updateGameCard(gameinfo, oldhash)
         //if selectdialog is open, close it!
         $(`.modal[data-game-hash="${oldhash}"]`).modal('hide')
-    }    
+    }
     async updateGameCard(gameinfo, oldhash) {
         const hash = oldhash || gameinfo.hash
         let cnt = $(`[data-hash="${oldhash}"].gameitem`)
@@ -103,11 +106,24 @@
         }
         core.theme.onNewElementAdded(cnt)
         if (newone) {
+            $(cnt).on('click', () => {
+                //this.log(e.originalEvent)
+                if (cnt.is('.started')) {
+                    this.openDialogGame(gameinfo.hash)
+                } else {
+                    this.startGameByHash(gameinfo.hash)
+                }
+            })
+            $(cnt).on('contextmenu', () => {
+                this.openDialogGame(gameinfo.hash)
+            })
             $('#gamegrid #gamegrid_centerer').append(cnt)
         }
-        //}
+
+
+        //}    
     }
-    async selectGame(hash) {
+    async openDialogGame(hash) {
         const gameinfo = await core.kernel.gamelist_getGameByHash(hash, true)
         //this.log(gameinfo)
 
@@ -158,19 +174,7 @@
         })
 
         body.find('.btn-start').on('click', async (e) => {
-            body.find('.btn-start').addClass('game-starting')
-            const ret = (await core.kernel.startGameByHash(hash)).returns?.last
-            //
-            this.log(ret)
-            if (ret.error) {
-                body.find('.btn-start').removeClass('game-starting')
-                await core.theme.showDialog({
-                    title: ret.error.title,
-                    body: ret.error.message + '<p class="game-error text-danger">' + ret.exit.log + '</p>',
-                    understand: true
-                })
-
-            }
+            this.startGameByHash(hash)
             e.preventDefault()
             return false
         })
@@ -191,5 +195,25 @@
                 }
             }
         })
+    }
+    async startGameByHash(hash) {
+        const gameisstarted = await core.kernel.gameList_isGameStartedByHash(hash)
+        if (gameisstarted) {
+            return
+        }
+
+        const body = $(`.modal[data-game-hash="${hash}"]`)
+        body.find('.btn-start').addClass('game-starting')
+        const ret = (await core.kernel.startGameByHash(hash)).returns?.last
+        //
+        //this.log(ret)
+        if (ret.error) {
+            body.find('.btn-start').removeClass('game-starting')
+            await core.theme.showDialog({
+                title: ret.error.title,
+                body: ret.error.message + '<p class="game-error text-danger">' + ret.exit.log + '</p>',
+                understand: true
+            })
+        }
     }
 }

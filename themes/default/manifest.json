@@ -19,6 +19,7 @@
         "3th/jquery-ui/jquery-ui.structure.min.css": "main_loaded",
         "3th/jquery-ui/jquery-ui.theme.min.css": "main_loaded",
         "3th/bootstrap.min.css": "main_loaded",
+        "3th/animate.min.css": "main_loaded",
         "3th/material-icons/material-icons.css": "materialicons_loaded",
         "main.css": "main_loaded",
         "fonts.css": "fonts_loaded"

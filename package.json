@@ -15,6 +15,7 @@
     "start": "electron . --develop",
     "prod": "electron .",
     "release": "electron-builder",
+    "packager_test": "electron-packager ./ --overwrite --ignore=/.vscode --ignore=/appData --ignore=/dist",
     "dist:linux": "yarn release -l",
     "dist:linux:deb": "yarn release -l deb",
     "dist:linux:targz": "yarn release -l tar.gz",
@@ -28,14 +29,16 @@
     "update-mi": "cd themes/default/3th/material-icons/ && curl --fail-with-body https://raw.githubusercontent.com/google/material-design-icons/master/font/MaterialIconsOutlined-Regular.otf > MaterialIcons-Outlined-Regular.otf && curl --fail-with-body https://raw.githubusercontent.com/google/material-design-icons/master/font/MaterialIconsRound-Regular.otf > MaterialIcons-Filled-Regular.otf && sfnt2woff MaterialIcons-Filled-Regular.otf && sfnt2woff MaterialIcons-Outlined-Regular.otf"
   },
   "dependencies": {
-    "@electron/remote": "^1.0.4",
+    "@electron/remote": "^1.1.0",
     "command-line-parser": "^0.1.10",
+    "debug": "^4.3.1",
     "electron-default-menu": "^1.0.2",
     "md5": "^2.3.0",
     "mkdirp": "^1.0.4",
     "node-fetch": "^2.6.1",
     "node-vdf": "^0.0.3",
     "platform-folders": "^0.5.2",
+    "ps-node": "^0.1.6",
     "rimraf": "^3.0.2",
     "sprintf-js": "^1.1.2",
     "sqlite": "^4.0.21",
@@ -70,6 +73,9 @@
     }
   },
   "devDependencies": {
-    "electron": "^12.0.0"
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "electron": "^12.0.0",
+    "electron-builder": "^22.10.5",
+    "electron-packager": "^15.2.0"
   }
 }
