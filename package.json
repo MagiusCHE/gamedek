@@ -15,7 +15,6 @@
     "start": "electron . --develop",
     "prod": "electron .",
     "release": "electron-builder",
-    "packager_test": "electron-packager ./ --overwrite --ignore=/.vscode --ignore=/appData --ignore=/dist",
     "dist:linux": "yarn release -l",
     "dist:linux:deb": "yarn release -l deb",
     "dist:linux:targz": "yarn release -l tar.gz",
@@ -73,9 +72,7 @@
     }
   },
   "devDependencies": {
-    "@electron-forge/cli": "^6.0.0-beta.54",
     "electron": "^12.0.0",
-    "electron-builder": "^22.10.5",
-    "electron-packager": "^15.2.0"
+    "electron-builder": "*"
   }
 }

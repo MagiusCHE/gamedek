@@ -37,6 +37,10 @@ class myplugin extends global.Plugin {
             this.#library.lastUpdate = new Date()
         }
 
+        for (const game of this.#library.games) {
+            delete game.lastExecutionLog //back compatibility
+        }
+
         await kernel.broadcastPluginMethod('gameengine', 'libraryLoaded', this.#library)
 
         this.log(`Loaded library (${this.#library.games.length} games).`)
@@ -99,7 +103,12 @@ class myplugin extends global.Plugin {
             const ela = exists.lastStop - exists.lastStart
             exists.playTime = (exists.playTime || 0) + ela
         }
-        exists.lastExecutionLog = log
+        const gamelogdir = path.join(kernel.appDataRoot, 'logs', 'games')
+        mkdirp.sync(gamelogdir)
+
+        delete exists.lastExecutionLog //back compatibility
+
+        fs.writeFileSync(path.join(gamelogdir, exists.hash + '.log'), typeof log == 'string' ? log : JSON.stringify(log, undefined, 2))
 
         this.saveLibrary()
 
