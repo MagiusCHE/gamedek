@@ -30,3 +30,4 @@ jobs:
         run: |
           yarn
           yarn dist:linux:targz
+          yarn publish:draft:linux
