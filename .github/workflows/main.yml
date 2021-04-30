@@ -29,9 +29,6 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
-          echo "GH_TOKEN ${{ secrets.GH_TOKEN }}"
-          echo "GITHUB_TOKEN ${{ secrets.GITHUB_TOKEN }}"
-          env
-          echo "yarn"
-          echo "yarn dist:linux:targz"
-          echo "yarn publish:draft:linux"
+          yarn
+          yarn dist:linux:targz
+          yarn publish:draft:linux
