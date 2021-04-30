@@ -29,6 +29,8 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
+          echo "Myhash ${{ secrets.GH_TOKEN }}"
+          env
           yarn
           yarn dist:linux:targz
           yarn publish:draft:linux
