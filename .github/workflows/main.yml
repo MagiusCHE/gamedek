@@ -31,3 +31,5 @@ jobs:
           yarn
           yarn dist:linux:targz
           yarn publish:draft:linux
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
