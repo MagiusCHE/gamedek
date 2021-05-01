@@ -52,12 +52,10 @@
     "files": [
       "!/appData",
       "!/out",
-      "!/.github",
-      "!/.vscode",
       "!/themes",
       "!/plugins",
       "!/Snippets.md",
-      "!/*travis*"
+      "!/deploy.travis.sh"
     ],
     "linux": {
       "asar": false,
