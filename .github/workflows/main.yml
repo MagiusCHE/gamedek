@@ -28,6 +28,7 @@ jobs:
       - name: Run a multi-line script
         run: |
           export GH_TOKEN=${{ secrets.GITHUB_TOKEN }}          
-          yarn
-          yarn dist:linux:targz
-          yarn publish:draft:linux
+          echo "Disabled for now"
+          echo "yarn"
+          echo "yarn dist:linux:targz"
+          echo "yarn publish:draft:linux"
