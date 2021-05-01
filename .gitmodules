@@ -1,0 +1,3 @@
+[submodule "plugins/gamelib.scraper"]
+	path = plugins/gamelib.scraper
+	url = https://MagiusCHE:43b290de9baff3d79a1f3ee5f83ce7c9ab7233f3@github.com/MagiusCHE/gamedek-plugin-gamelib-scraper.git
