@@ -28,7 +28,7 @@
     "publish:draft:linux": "yarn publish:draft:_common -l",
     "publish:draft:win": "yarn publish:draft:_common -w",
     "publish:draft": "yarn publish:draft:_common -wl",
-    "aur-make": ""
+    "aur-make": "cd archlinux-aur && rm -rf *.zst && makepkg -f && echo \"install with: yay -U archlinux-aur/$(ls -1 *.zst)\""
   },
   "dependencies": {
     "@electron/remote": "^1.1.0",

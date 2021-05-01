@@ -1,6 +1,6 @@
 # Maintainer: Alessandro Marchioro <marciozgaming@gmail.com>
-pkgname=gamedek-git
-pkgver=r64.87c420f
+pkgname=gamedek
+pkgver=r65.afe68c7
 pkgrel=1
 pkgdesc="Fancy themable panel to place all game links."
 arch=(x86_64)
@@ -43,5 +43,5 @@ Comment=Fancy themable panel to place all game links.
 Exec=gamedek
 Icon=/opt/gamedek/icon.png
 Terminal=false" >> $pkgdir/usr/share/applications/gamedek.desktop
-	cd $pkgdir/opt/gamedek/ && curl -O https://github.com/MagiusCHE/gamedek/raw/prod/icon.png
+	cd $pkgdir/opt/gamedek/ && curl -O https://raw.githubusercontent.com/MagiusCHE/gamedek/prod/icon.png
 }

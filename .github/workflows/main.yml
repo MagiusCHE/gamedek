@@ -30,4 +30,4 @@ jobs:
           export GH_TOKEN=${{ secrets.GITHUB_TOKEN }}                    
           yarn
           yarn dist:linux:targz
-          yarn publish:draft:linux
+          echo "yarn publish:draft:linux"
