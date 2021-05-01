@@ -28,3 +28,6 @@
 [submodule "plugins/service.exec"]
 	path = plugins/service.exec
 	url = https://github.com/MagiusCHE/gamedek-plugin-service-exec.git
+[submodule "themes/default"]
+	path = themes/default
+	url = https://github.com/MagiusCHE/gamedek-theme-default.git
