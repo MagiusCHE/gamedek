@@ -367,7 +367,7 @@ const $this = {
         }
         const manifest = path.join(fullPath, 'manifest.json')
         try {
-            const plugin = await Plugin.create(fullPath, plugin_name, manifest)
+            const plugin = await Plugin.create(fullPath, manifest)
             if (plugin) {
                 $this.clientOptions.plugins[plugin_name] = plugin
             } else {

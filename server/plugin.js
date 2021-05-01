@@ -2,7 +2,7 @@
 const fs = require('fs')
 const path = require('path')
 class Plugin {
-    static async create(root, name, manifest) {
+    static async create(root, manifest) {
         const classname = require(path.join(root, 'plugin.js'))
 
         const plugin = new classname(root, manifest)

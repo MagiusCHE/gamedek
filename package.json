@@ -9,7 +9,7 @@
     "name": "Magius(CHE)",
     "email": "magiusche@magius.it"
   },
-  "license": "GNU GPL",
+  "license": "GPL-3.0-or-later",
   "private": false,
   "scripts": {
     "test": "echo success",
