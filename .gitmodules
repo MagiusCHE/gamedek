@@ -1,3 +1,30 @@
 [submodule "plugins/gamelib.scraper"]
 	path = plugins/gamelib.scraper
 	url = https://MagiusCHE:43b290de9baff3d79a1f3ee5f83ce7c9ab7233f3@github.com/MagiusCHE/gamedek-plugin-gamelib-scraper.git
+[submodule "plugins/gamelib.common"]
+	path = plugins/gamelib.common
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-gamelib-common.git
+[submodule "plugins/gamelib.linux"]
+	path = plugins/gamelib.linux
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-gamelib-linux.git
+[submodule "plugins/gamelib.lutris"]
+	path = plugins/gamelib.lutris
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-gamelib-lutris.git
+[submodule "plugins/gamelib.manager"]
+	path = plugins/gamelib.manager
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-gamelib-manager.git
+[submodule "plugins/gamelib.steam"]
+	path = plugins/gamelib.steam
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-gamelib-steam.git
+[submodule "plugins/localization"]
+	path = plugins/localization
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-localization.git
+[submodule "plugins/scraper.steam"]
+	path = plugins/scraper.steam
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-scraper-steam.git
+[submodule "plugins/service.curl"]
+	path = plugins/service.curl
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-service-curl.git
+[submodule "plugins/service.exec"]
+	path = plugins/service.exec
+	url = https://MagiusCHE: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@github.com/MagiusCHE/gamedek-plugin-service-exec.git
