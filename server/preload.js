@@ -1,5 +1,6 @@
 const mainWindow = require('@electron/remote');
 const fs = require('fs')
+const path = require('path')
 const { ipcRenderer } = require('electron')
 
 const allfu = ipcRenderer.sendSync('kernelFuncs', 'init')
@@ -33,6 +34,8 @@ ipcRenderer.on('kernelEvent', (event, message) => {
 document.addEventListener('DOMContentLoaded', () => {
     var ga = document.createElement('script');
     ga.type = 'text/javascript';
+    //console.log(`DOMContentLoaded: core %s`, path.resolve('scripts/core.js'))
+    process.chdir(path.resolve('resources/app'))
     ga.src = 'scripts/core.js?v=' + fs.statSync('scripts/core.js').mtime.getTime()
     var s = document.getElementById('preloader');
     s.appendChild(ga);

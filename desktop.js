@@ -33,6 +33,8 @@ function createWindow() {
 
     const kernel = require('./server/kernel')
 
+    //mainWindow.show()
+
     kernel.init()
     globalShortcut.register('F11', () => {
         if (mainWindow.isFullScreen()) {
