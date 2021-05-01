@@ -19,10 +19,14 @@ class Theme {
     #htmlpieces = {}
     #jsloaded = {}
     constructor(manifest) {
-        this.manifest = manifest
+        this.manifest = manifest       
     }
     #locale = undefined
     async init() {
+
+        const locale = await core.loadJSON((await core.kernel.getThemeUrl('locale.json')))
+        await core.kernel.broadcastPluginMethod('localization', 'addLocaleStrings', this.getName() , locale)
+
         const jss = []
         const csss = []
         const csss_ctrl = []
@@ -350,13 +354,17 @@ class Theme {
     }
     log() {
         const margs = Array.from(arguments)
-        margs.unshift(`${this.constructor.name}: ${this.manifest.name}`)
+        margs.unshift(`${this.constructor.name}: ${this.getName()}`)
         core.log.apply(core, margs)
     }
     logError = function() {
         const margs = Array.from(arguments)
-        margs.unshift(`${this.constructor.name}: ${this.manifest.name}`)
+        margs.unshift(`${this.constructor.name}: ${this.getName()}`)
         core.logError.apply(core, margs)
+    }
+
+    getName() {
+        return this.manifest.name.split('.').pop()
     }
 
     async registerNavigationEvents() {
