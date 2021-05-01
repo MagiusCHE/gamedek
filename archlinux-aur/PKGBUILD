@@ -1,6 +1,6 @@
 # Maintainer: Alessandro Marchioro <marciozgaming@gmail.com>
 pkgname=gamedek
-pkgver=r65.afe68c7
+pkgver=r67.bb4095f
 pkgrel=1
 pkgdesc="Fancy themable panel to place all game links."
 arch=(x86_64)

@@ -35,22 +35,31 @@ function createWindow() {
 
     if (!global.production) {
         mainWindow.show()
+    } else {
+        mainWindow.setMenu(null)
     }
 
     kernel.init()
+
+    //}
     globalShortcut.register('F11', () => {
         if (mainWindow.isFullScreen()) {
             mainWindow.setFullScreen(false)
-            mainWindow.setMenu(_cachedDefaultMenu)
+            if (!global.production) {
+                mainWindow.setMenu(_cachedDefaultMenu)
+            }
         } else {
-            if (!_cachedDefaultMenu) {
-                _cachedDefaultMenu = Menu.buildFromTemplate(defaultMenu(app, shell))
+            if (!global.production) {
+                if (!_cachedDefaultMenu) {
+                    _cachedDefaultMenu = Menu.buildFromTemplate(defaultMenu(app, shell))
+                }
             }
             mainWindow.setFullScreen(true)
-            mainWindow.setMenu(null)
+            if (!global.production) {
+                mainWindow.setMenu(null)
+            }
         }
     })
-    //}
 
     kernel.mainWindow = mainWindow
     // and load the index.html of the app.
