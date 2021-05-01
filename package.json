@@ -49,7 +49,7 @@
   "build": {
     "appId": "it.magius.gamedek",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
-    "files":[
+    "files": [
       "!/appData",
       "!/out",
       "!/.github",
@@ -60,7 +60,7 @@
       "!/*travis*"
     ],
     "linux": {
-      "asar": true,
+      "asar": false,
       "category": "Game",
       "packageCategory": "Game",
       "executableName": "gamedek",

@@ -33,7 +33,9 @@ function createWindow() {
 
     const kernel = require('./server/kernel')
 
-    //mainWindow.show()
+    if (!global.production) {
+        mainWindow.show()
+    }
 
     kernel.init()
     globalShortcut.register('F11', () => {

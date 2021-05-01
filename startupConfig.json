@@ -1,7 +1,7 @@
 {
     "theme": "default",
     "plugins_comments": "Plugins order is very important! It affects the calling order of the broadcast methods.",
-    "plugins": {        
+    "plugins": {
         "gamelib.scraper": true,
         "gamelib.common": true,
         "gamelib.linux": true,
@@ -28,8 +28,7 @@
         "loadcss": true
     },
     "debug": {
-        "version": true,
-        "immediateshow": true
+        "version": true
     },
     "initialWindowAppearTimeout": 5000
 }
