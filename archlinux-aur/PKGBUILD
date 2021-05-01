@@ -1,6 +1,6 @@
 # Maintainer: Alessandro Marchioro <marciozgaming@gmail.com>
 pkgname=gamedek
-pkgver=r67.bb4095f
+pkgver=r68.4b6b8a2
 pkgrel=1
 pkgdesc="Fancy themable panel to place all game links."
 arch=(x86_64)
@@ -19,7 +19,7 @@ pkgver() {
 
 build() {
 	cd "gamedek"
-	source /usr/share/nvm/init-nvm.sh
+	bash /usr/share/nvm/init-nvm.sh
 	nvm install 15.14.0
 	yarn
 	yarn dist:linux:unpacked

@@ -11,6 +11,15 @@ Fancy, themable, multilanguage, moddable panel to place all game links.
 
 ![immagine](https://user-images.githubusercontent.com/46496052/116123083-dd347180-a6c2-11eb-9a1f-3872ddbf4155.png)
 
+## Build
+- Clone entire project
+- `yarn update`
+- `yarn dist:linux:unpacked` (or any other dist)
+- install package in your os specified folder.
+  - for arch linux install it in `/opt/gamedek` (or use `yarn aur-install`)
+- `yarn local-update-plugins-themes` to use all plugins and default theme
+- `gamedek` to launch it!
+
 ## Travis-CI in Prod
 - Every pull in `prod` will trigger Travis compilation and release.
 

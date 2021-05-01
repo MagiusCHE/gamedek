@@ -13,6 +13,7 @@
   "private": false,
   "scripts": {
     "test": "echo success",
+    "update":"yarn && for d in ./plugins/*/ ; do (cd \"$d\" && yarn); done",
     "start": "electron . --develop",
     "prod": "electron .",
     "release": "electron-builder",
@@ -29,7 +30,7 @@
     "publish:draft:win": "yarn publish:draft:_common -w",
     "publish:draft": "yarn publish:draft:_common -wl",
     "aur-make": "cd archlinux-aur && rm -rf *.zst && makepkg -f && echo \"install with: yay -U archlinux-aur/$(ls -1 *.zst)\"",
-    "aur-install": "yarn aur-make && yay -U $(ls -1 archlinux-aur/*.zst)",
+    "aur-install": "yarn aur-make && yay -U $(ls -1 archlinux-aur/*.zst) && yarn local-update-plugins-themes",
     "local-update-plugins-themes": "rm ~/.local/share/GameDek/plugins -rf && rm ~/.local/share/GameDek/themes -rf && mkdir -p ~/.local/share/GameDek/plugins && cp plugins/* ~/.local/share/GameDek/plugins/ -r && mkdir -p ~/.local/share/GameDek/themes && cp themes/* ~/.local/share/GameDek/themes/ -r"
   },
   "dependencies": {
@@ -45,12 +46,17 @@
     "appId": "it.magius.gamedek",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "files": [
-      "!/appData",
-      "!/out",
-      "!/themes",
-      "!/plugins",
-      "!/Snippets.md",
-      "!/deploy.travis.sh"
+      "!archlinux-aur",
+      "!dist",
+      "!.github",
+      "!.gitmodules",
+      "!.vscode",
+      "!appData",
+      "!out",
+      "!themes",
+      "!plugins",
+      "!Snippets.md",
+      "!deploy.travis.sh"
     ],
     "linux": {
       "asar": false,
