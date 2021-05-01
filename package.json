@@ -49,6 +49,16 @@
   "build": {
     "appId": "it.magius.gamedek",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "files":[
+      "!/appData",
+      "!/out",
+      "!/.github",
+      "!/.vscode",
+      "!/themes",
+      "!/plugins",
+      "!/Snippets.md",
+      "!/*travis*"
+    ],
     "linux": {
       "asar": true,
       "category": "Game",
