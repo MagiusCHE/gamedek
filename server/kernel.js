@@ -365,9 +365,10 @@ const $this = {
             logError(` - `, path.resolve(path.join('.', 'plugins', plugin_name)))
             throw new Error(`Missing plugin "${plugin_name}". App cannnot start.`)
         }
-        const manifest = path.join(fullPath, 'manifest.json')
+        const manifest = JSON.parse(fs.readFileSync(path.join(fullPath, 'manifest.json')).toString())
+        const pkg = JSON.parse(fs.readFileSync(path.join(fullPath, 'package.json')).toString())
         try {
-            const plugin = await Plugin.create(fullPath, manifest)
+            const plugin = await Plugin.create(fullPath, { ...pkg, ...manifest })
             if (plugin) {
                 $this.clientOptions.plugins[plugin_name] = plugin
             } else {

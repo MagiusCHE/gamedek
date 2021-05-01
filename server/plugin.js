@@ -16,7 +16,7 @@ class Plugin {
     manifest = undefined
     constructor(root, manifest) {
         this.#rootPath = root
-        this.manifest = JSON.parse(fs.readFileSync(manifest).toString())
+        this.manifest = manifest
         this.#name = this.manifest.simpleName || path.basename(root)
     }
     pluginPath(relpath) {

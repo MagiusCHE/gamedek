@@ -344,8 +344,9 @@
                 }
 
                 const thememanifest = await $this.loadJSON((await $this.kernel.getThemeUrl('manifest.json')))
+                const pkg = await $this.loadJSON((await $this.kernel.getThemeUrl('package.json')))
 
-                $this.theme = await Theme.create(thememanifest)
+                $this.theme = await Theme.create({ ...pkg, ...thememanifest })
 
                 await $this.theme.updateTitle()
 
