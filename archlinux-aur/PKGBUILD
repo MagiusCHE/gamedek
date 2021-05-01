@@ -1,0 +1,47 @@
+# Maintainer: Alessandro Marchioro <marciozgaming@gmail.com>
+pkgname=gamedek-git
+pkgver=r64.87c420f
+pkgrel=1
+pkgdesc="Fancy themable panel to place all game links."
+arch=(x86_64)
+url="https://github.com/MagiusCHE/gamedek.git"
+license=('GPL-3.0-or-later')
+makedepends=(git 'nvm' 'yarn')
+optdepends=()
+provides=(gamedek)
+source=("git+$url")
+md5sums=('SKIP')
+
+pkgver() {
+       cd "gamedek"
+       printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+	cd "gamedek"
+	source /usr/share/nvm/init-nvm.sh
+	nvm install 15.14.0
+	yarn
+	yarn dist:linux:unpacked
+}
+
+package() {
+	rm "$pkgdir/usr/bin/gamedek" 2&>/dev/null || true
+	mkdir -p "$pkgdir/opt/gamedek/"
+	mkdir -p "$pkgdir/usr/bin/"
+	cp -R gamedek/dist/linux-unpacked/* "$pkgdir/opt/gamedek/"
+	cd "$pkgdir/usr/bin/"
+	ln -s "/opt/gamedek/gamedek"
+
+	# Adding desktop entry
+	mkdir -p "$pkgdir/usr/share/applications/"
+	echo "[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=GameDek
+Comment=Fancy themable panel to place all game links.
+Exec=gamedek
+Icon=/opt/gamedek/icon.png
+Terminal=false" >> $pkgdir/usr/share/applications/gamedek.desktop
+	cd $pkgdir/opt/gamedek/ && curl -O https://github.com/MagiusCHE/gamedek/raw/prod/icon.png
+}

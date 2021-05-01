@@ -17,6 +17,7 @@
     "prod": "electron .",
     "release": "electron-builder",
     "dist:linux": "yarn release -l",
+    "dist:linux:unpacked": "yarn release -l --dir",
     "dist:linux:deb": "yarn release -l deb",
     "dist:linux:zip": "yarn release -l zip",
     "dist:linux:targz": "yarn release -l tar.gz",
@@ -27,7 +28,7 @@
     "publish:draft:linux": "yarn publish:draft:_common -l",
     "publish:draft:win": "yarn publish:draft:_common -w",
     "publish:draft": "yarn publish:draft:_common -wl",
-    "update-mi": "cd themes/default/3th/material-icons/ && curl --fail-with-body https://raw.githubusercontent.com/google/material-design-icons/master/font/MaterialIconsOutlined-Regular.otf > MaterialIcons-Outlined-Regular.otf && curl --fail-with-body https://raw.githubusercontent.com/google/material-design-icons/master/font/MaterialIconsRound-Regular.otf > MaterialIcons-Filled-Regular.otf && sfnt2woff MaterialIcons-Filled-Regular.otf && sfnt2woff MaterialIcons-Outlined-Regular.otf"
+    "aur-make": ""
   },
   "dependencies": {
     "@electron/remote": "^1.1.0",
