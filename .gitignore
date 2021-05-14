@@ -5,3 +5,4 @@ node_modules
 /appData
 /GameDek-linux-x64
 out/
+package-lock.json
