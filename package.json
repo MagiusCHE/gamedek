@@ -13,7 +13,7 @@
   "private": false,
   "scripts": {
     "test": "echo success",
-    "update":"yarn && for d in ./plugins/*/ ; do (cd \"$d\" && yarn); done",
+    "update": "yarn && for d in ./plugins/*/ ; do (cd \"$d\" && yarn); done",
     "start": "electron . --develop",
     "prod": "electron .",
     "release": "electron-builder",
@@ -84,6 +84,6 @@
   },
   "devDependencies": {
     "electron": "^12.0.0",
-    "electron-builder": "^22.10.5"
+    "electron-builder": "^22.11.4"
   }
 }
