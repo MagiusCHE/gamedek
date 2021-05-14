@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/MagiusCHE/gamedek.svg?branch=prod)](https://travis-ci.org/MagiusCHE/gamedek)
-
 # GameDek
 Fancy, themable, multilanguage, moddable panel to place all game links.
 
@@ -20,9 +18,6 @@ Fancy, themable, multilanguage, moddable panel to place all game links.
   - for arch linux install it in `/opt/gamedek` (or use `yarn aur-install`)
 - `yarn local-update-plugins-themes` to use all plugins and default theme
 - `gamedek` to launch it!
-
-## Travis-CI in Prod
-- Every push or PR to `prod` will trigger Travis compilation and release.
 
 ## Credits
 - for Core:
