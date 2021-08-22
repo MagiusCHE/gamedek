@@ -173,6 +173,9 @@ const $this = {
     gameList_addNewGame: async function(info) {
         return await $this.gameList.addNewGame(info)
     },
+    gameList_removeGame: async function(info) {
+        return await $this.gameList.removeGame(info)
+    },
     gameList_isGameStartedByHash: async function(hash) {
         return await $this.gameList.isGameStartedByHash(hash);
     },
