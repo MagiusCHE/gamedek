@@ -16,7 +16,7 @@ const $this = {
     init: () => {
         try {
             $this.initializing = true
-            $this.production = process.env.NODE_ENV = 'production'
+            $this.production = process.env.NODE_ENV == 'production'
 
             ipcMain.on('kernelFuncs', (event, arg) => {
                 event.returnValue = Object.keys($this).join(' ')
@@ -406,14 +406,19 @@ const $this = {
         if (!fs.existsSync(dest)) {
             return undefined
         }
-        return fs.readFileSync(dest).toString()
+        return JSON.parse(fs.readFileSync(dest).toString())
     },
     storeData: async (name, value) => {
+        if (typeof value != 'object') {
+            throw new Error(`storeData accepts only object as value. Passed: ` + value)
+        }
+        value = JSON.stringify(value)
         const savepath = path.join(appDataRoot, 'save')
         const dest = path.join(savepath, name + '.json')
         if (!fs.existsSync(savepath)) {
             mkdirp.sync(savepath)
         }
+        log(`Storing data %o into %o`, name, dest)
         return fs.writeFileSync(dest, value)
     },
     translateBlock: async function(text) {

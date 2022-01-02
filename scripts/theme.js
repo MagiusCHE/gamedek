@@ -18,14 +18,40 @@ class Theme {
     }
     #htmlpieces = {}
     #jsloaded = {}
+    #themeSimpleName
     constructor(manifest) {
-        this.manifest = manifest       
+        this.manifest = manifest  
+        this.#themeSimpleName = manifest.simpleName || manifest.name.split('.').pop()
     }
     #locale = undefined
+    #settings = {}
+    async setting(key, value) {
+        if (value === undefined) {
+            //this is GET
+            return this.#settings[key]
+        } 
+        //this is set
+        this.#settings[key] = value
+        this.log(`Autosave settings.`)
+        this.saveSettings()
+    }
+    getName() {
+        return this.#themeSimpleName    
+    }
+    async loadSettings() {
+        this.#settings = (await core.kernel.loadData(`theme-${this.getName()}-settings`)) || {}
+    }
+    saveSettings() {
+        waitForFinalEvent(() => {
+            core.kernel.storeData(`theme-${this.getName()}-settings`, this.#settings)
+        },'saveThemeSettings',100)
+    }
     async init() {
 
         const locale = await core.loadJSON((await core.kernel.getThemeUrl('locale.json')))
         await core.kernel.broadcastPluginMethod('localization', 'addLocaleStrings', this.getName() , locale)
+
+        await this.loadSettings()
 
         const jss = []
         const csss = []
@@ -220,6 +246,7 @@ class Theme {
 
         this.log('Loaded.')
     }
+
     #_allowHideProgress = true
     allowHideProgress(allow) {
         if (allow !== undefined) {
@@ -338,6 +365,8 @@ class Theme {
         const view = this.getCurrentView().cnt
         $('body #gd-viewscontainer').append(view)
         $('html').attr('data-gd-view', this.#visbilePageId)
+
+        await this.setting(`lastView`, this.#visbilePageId)        
     }
     async appearCurrentView(args) {
         await this.getCurrentView()?.obj.onAppear(args)
