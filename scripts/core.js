@@ -448,7 +448,7 @@
         return new Promise(resolve => {
             const deftimeout = 1;
             let timer
-            timer = setInterval(() => {
+            timer = setInterval(() => {                
                 if (getPassedTick() > $this.options.initialWindowAppearTimeout && !window.initialWindowAppeared) {
                     log('#### Initial window is not appear for 5 seconds.')
                     log(' Process is waiting for:', stringVariable_orCallback)
@@ -463,8 +463,8 @@
                     const totvars = stringVariable_orCallback.split(',');
                     allok = true
                     for (let i = 0; i < totvars.length; i++) {
-                        try {
-                            const ev = eval(totvars[i]);
+                        try {                            
+                            const ev = eval(`${totvars[i]} ? true : false`);
                             allok = ev ? true : false
                             if (!allok) {
                                 allok = false
@@ -666,6 +666,8 @@
     })()
 
 
+    log("Waity for window.$, window.kernel")
     await waitFor('window.$, window.kernel')
+    log("Go init ")
     core.init()
 })();
