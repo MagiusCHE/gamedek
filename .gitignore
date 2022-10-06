@@ -6,3 +6,4 @@ node_modules
 /GameDek-linux-x64
 out/
 package-lock.json
+.directory
