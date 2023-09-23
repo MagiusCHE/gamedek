@@ -1,6 +1,6 @@
 {
   "name": "it.magius.gamedek",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "productName": "GameDek",
   "productTitle": "GameDek",
   "description": "Fancy themable panel to place all game links.",
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@electron/remote": "^1.1.0",
-    "command-line-parser": "^0.1.10",
+    "command-line-parser": "^0.2.10",
     "debug": "^4.3.1",
     "electron-default-menu": "^1.0.2",
     "mkdirp": "^1.0.4",

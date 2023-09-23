@@ -478,10 +478,10 @@ combined-stream@^1.0.8:
   dependencies:
     delayed-stream "~1.0.0"
 
-command-line-parser@^0.1.10:
-  version "0.1.10"
-  resolved "https://registry.npmjs.org/command-line-parser/-/command-line-parser-0.1.10.tgz"
-  integrity sha1-56iZSlMYe/vI1wEp/9TVe8NybBI=
+command-line-parser@^0.2.10:
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/command-line-parser/-/command-line-parser-0.2.10.tgz#4ff1e222eb392ae3fcc16110e8337c57fb7d24ce"
+  integrity sha512-ltdABudGiokiv4e3prof0f0xoKX5jYIys/i2l0U2DB6Ys9eUoKvC/QrhuR1ZLjyb33wzLGov3oUtp8IWOj5roQ==
 
 commander@2.9.0:
   version "2.9.0"

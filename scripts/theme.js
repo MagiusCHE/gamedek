@@ -53,6 +53,11 @@ class Theme {
 
         await this.loadSettings()
 
+
+        if (this.#settings.window?.size) {
+            await core.kernel.setMainWindowSize(this.#settings.window?.size.width, this.#settings.window?.size.height)
+        }
+
         const jss = []
         const csss = []
         const csss_ctrl = []
@@ -240,6 +245,20 @@ class Theme {
                 ishtml: args.ishtml,
                 message: args.body
             })
+        })
+
+        $(window).on('resize', async (ev) => {   
+            waitForFinalEvent(async () => {
+                const ret = await core.kernel.getMainWindowSize()    
+                //this.log("Window new Size:", ret);
+                if (!this.#settings.window)
+                    this.#settings.window = {}
+                if (!this.#settings.window.size)
+                    this.#settings.window.size = {}
+                this.#settings.window.size.width = ret.w-1
+                this.#settings.window.size.height = ret.h-1
+                this.saveSettings()
+            }, 500,"getMainWindowSize")            
         })
 
         await this.setPage(this.manifest.entry)

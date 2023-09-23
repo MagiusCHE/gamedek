@@ -432,6 +432,17 @@ const $this = {
     showMessageBoxSync: async function(_args) {
         dialog.showMessageBoxSync(_args)
     },
+    setMainWindowSize: async function(w, h) {
+        log(`Window size is setted to %o`, { w, h })
+        $this.mainWindow.setSize(w, h)
+    },
+    getMainWindowSize: async function() {
+        const size = $this.mainWindow.getSize();
+        return {
+            w: size[0],
+            h: size[1]
+        }
+    },
     /*provider: async function({ request, method, args }) {
 
         for (const plugin_name in $this.clientOptions.plugins) {
