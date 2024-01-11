@@ -6,7 +6,8 @@ pkgdesc="Fancy themable panel to place all game links."
 arch=(x86_64)
 url="https://github.com/MagiusCHE/gamedek.git"
 license=('GPL-3.0-or-later')
-makedepends=(git 'nvm' 'yarn')
+makedepends=(git 'nvm')
+# YARN was removed from makedepends because it's not founded even if it's installed
 optdepends=()
 provides=(gamedek)
 source=("git+$url")
