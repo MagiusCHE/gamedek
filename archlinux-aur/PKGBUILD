@@ -1,6 +1,6 @@
 # Maintainer: Magius(CHE) <magiusche@magius.it>
 pkgname=gamedek
-pkgver=r97.165b7ca
+pkgver=r100.1d63b6d
 pkgrel=1
 pkgdesc="Fancy themable panel to place all game links."
 arch=(x86_64)
