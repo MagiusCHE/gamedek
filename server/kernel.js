@@ -52,6 +52,7 @@ const $this = {
                 $this.appDataRoot = path.join(getPath('appData'), pjson.productName)
                 const appConfigFile = $this.appDataRoot + '/config.json'
                 if (!fs.existsSync(appConfigFile)) {
+                    mkdirp.sync($this.appDataRoot)
                     fs.writeFileSync(appConfigFile, JSON.stringify(startupConfig, undefined, 2))
                 } else {
                     startupConfig = JSON.parse(fs.readFileSync(appConfigFile).toString())

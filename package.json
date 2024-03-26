@@ -31,7 +31,7 @@
     "publish:draft:win": "yarn publish:draft:_common -w",
     "publish:draft": "yarn publish:draft:_common -wl",
     "aur-make": "cd archlinux-aur && rm -rf *.zst && makepkg -f && echo \"install with: yay -U archlinux-aur/$(ls -1 *.zst)\"",
-    "aur-install": "yarn aur-make && yay -U $(ls -1 archlinux-aur/*.zst) && yarn local-update-plugins-themes",
+    "aur-install": "yarn aur-make && yay -U $(ls -lt1 archlinux-aur/*.zst | head -n 1) && yarn local-update-plugins-themes",
     "local-update-plugins-themes": "rm ~/.local/share/GameDek/plugins -rf && rm ~/.local/share/GameDek/themes -rf && mkdir -p ~/.local/share/GameDek/plugins && cp plugins/* ~/.local/share/GameDek/plugins/ -r && mkdir -p ~/.local/share/GameDek/themes && cp themes/* ~/.local/share/GameDek/themes/ -r"
   },
   "dependencies": {
