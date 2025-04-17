@@ -398,6 +398,7 @@ const $this = {
     showWindow: async () => {
         $this.mainWindow.show()
         if (!global.production || global.openDevTools) {
+            log('showWindow force openDevTools')
             $this.mainWindow.webContents.openDevTools()
         }
     },
