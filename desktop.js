@@ -12,6 +12,10 @@ if (!argsObj.develop) {
     process.env.NODE_ENV = 'production'
 }
 
+console.log('Command-line arguments:', argsObj)
+
+global.openDevTools = argsObj.debugger || false
+
 global.production = process.env.NODE_ENV == 'production'
 
 function createWindow() {
