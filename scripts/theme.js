@@ -418,6 +418,11 @@ class Theme {
     async registerNavigationEvents() {
         $(document).on('keydown', ev => {
             this.log('key pressed', ev.originalEvent.which)
+            if (ev.originalEvent.which == 123) {
+                //F12
+                this.log('Call openDevTools', core.kernel.openDevTools)
+                core.kernel.openDevTools()
+            }
 
         })
     }

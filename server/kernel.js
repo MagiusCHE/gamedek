@@ -395,11 +395,14 @@ const $this = {
             args: args
         }))
     },
+    openDevTools: async () => {
+        log('showDevTools invoked')
+        $this.mainWindow.webContents.openDevTools()
+    },
     showWindow: async () => {
         $this.mainWindow.show()
         if (!global.production || global.openDevTools) {
-            log('showWindow force openDevTools')
-            $this.mainWindow.webContents.openDevTools()
+            $this.openDevTools()
         }
     },
     loadData: async (name) => {
