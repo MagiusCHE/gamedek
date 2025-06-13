@@ -54,7 +54,11 @@ class Theme {
         await this.loadSettings()
 
 
-        if (this.#settings.window?.size) {
+        if (this.#settings.window?.bounds) {
+            // Use bounds if available (includes both size and position)
+            await core.kernel.setMainWindowBounds(this.#settings.window.bounds)
+        } else if (this.#settings.window?.size) {
+            // Fallback to just size for backward compatibility
             await core.kernel.setMainWindowSize(this.#settings.window?.size.width, this.#settings.window?.size.height)
         }
 
@@ -247,19 +251,27 @@ class Theme {
             })
         })
 
-        $(window).on('resize', async (ev) => {   
+        // Save window bounds on resize or move
+        const saveWindowBounds = async () => {
             waitForFinalEvent(async () => {
-                const ret = await core.kernel.getMainWindowSize()    
-                //this.log("Window new Size:", ret);
+                const bounds = await core.kernel.getMainWindowBounds()    
+                //this.log("Window new bounds:", bounds);
                 if (!this.#settings.window)
                     this.#settings.window = {}
+                this.#settings.window.bounds = bounds
+                // Keep size for backward compatibility
                 if (!this.#settings.window.size)
                     this.#settings.window.size = {}
-                this.#settings.window.size.width = ret.w-1
-                this.#settings.window.size.height = ret.h-1
+                this.#settings.window.size.width = bounds.width
+                this.#settings.window.size.height = bounds.height
                 this.saveSettings()
-            }, 500,"getMainWindowSize")            
-        })
+            }, 500,"saveWindowBounds")            
+        }
+        
+        $(window).on('resize', saveWindowBounds)
+        
+        // Also save when window is moved
+        $(document).on('kernel.onWindowMoved', saveWindowBounds)
 
         await this.setPage(this.manifest.entry)
 

@@ -404,6 +404,11 @@ const $this = {
         if (!global.production || global.openDevTools) {
             $this.openDevTools()
         }
+        
+        // Listen for window move events
+        $this.mainWindow.on('move', () => {
+            $this.sendEvent('onWindowMoved')
+        })
     },
     loadData: async (name) => {
         const savepath = path.join(appDataRoot, 'save')
@@ -447,6 +452,49 @@ const $this = {
             w: size[0],
             h: size[1]
         }
+    },
+    setMainWindowPosition: async function(x, y) {
+        log(`Window position is setted to %o`, { x, y })
+        $this.mainWindow.setPosition(x, y)
+    },
+    getMainWindowPosition: async function() {
+        const position = $this.mainWindow.getPosition();
+        return {
+            x: position[0],
+            y: position[1]
+        }
+    },
+    getMainWindowBounds: async function() {
+        const bounds = $this.mainWindow.getBounds();
+        return bounds;
+    },
+    setMainWindowBounds: async function(bounds) {
+        // Get current screen bounds to ensure window stays visible
+        const { screen } = require('electron')
+        const displays = screen.getAllDisplays()
+        let isVisible = false
+        
+        // Check if the window would be visible on any display
+        for (const display of displays) {
+            const { x, y, width, height } = display.bounds
+            if (bounds.x + bounds.width > x && bounds.x < x + width &&
+                bounds.y + bounds.height > y && bounds.y < y + height) {
+                isVisible = true
+                break
+            }
+        }
+        
+        // If window would be off-screen, center it on primary display
+        if (!isVisible) {
+            const primaryDisplay = screen.getPrimaryDisplay()
+            const { width, height } = primaryDisplay.bounds
+            bounds.x = Math.floor((width - bounds.width) / 2)
+            bounds.y = Math.floor((height - bounds.height) / 2)
+            log(`Window would be off-screen, centering to %o`, { x: bounds.x, y: bounds.y })
+        }
+        
+        log(`Window bounds are set to %o`, bounds)
+        $this.mainWindow.setBounds(bounds)
     },
     /*provider: async function({ request, method, args }) {
 
