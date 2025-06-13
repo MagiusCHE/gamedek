@@ -10,13 +10,13 @@ Fancy, themable, multilanguage, moddable panel to place all game links.
 ![immagine](https://user-images.githubusercontent.com/46496052/116123083-dd347180-a6c2-11eb-9a1f-3872ddbf4155.png)
 
 ## Build
-- Requirements: `node 16.0`, `yarn` (aur require basic [aur package devel tools](https://wiki.archlinux.org/title/creating_packages))
+- Requirements: `node 16.0`, `npm` (aur require basic [aur package devel tools](https://wiki.archlinux.org/title/creating_packages))
 - `git clone --recurse-submodules -j8 https://github.com/MagiusCHE/gamedek.git` clone entire project
-- `cd gamedek && yarn update` to update all dependencies
-- `yarn dist:linux:unpacked` (or any other dist)
+- `cd gamedek && npm run update` to update all dependencies
+- `npm run dist:linux:unpacked` (or any other dist)
 - install package in your os specified folder. (from `/dist`)
-  - for arch linux install it in `/opt/gamedek` (or use `yarn aur-install`)
-- `yarn local-update-plugins-themes` to use all plugins and default theme
+  - for arch linux install it in `/opt/gamedek` (or use `npm run aur-install`)
+- `npm run local-update-plugins-themes` to use all plugins and default theme
 - `gamedek` to launch it!
 
 ## Credits
