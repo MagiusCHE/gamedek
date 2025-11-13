@@ -349,10 +349,10 @@ const $this = {
                     ret.returns.all = {}
                 }
                 try {
-                    log(`Broadcasting plugin method "${method}" to plugin "${plugin_name}" with args: %o`, args)
+                    //log(`Broadcasting plugin method "${method}" to plugin "${plugin_name}" with args: %o`, args)
                     ret.returns.all[plugin_name] = await plugin[method].apply(plugin, args)
                 } catch (err) {
-                    logError(`Plugin method "${method}" returned error:`, err);
+                    //logError(`Plugin method "${method}" returned error:`, err);
                     ret.returns.all[plugin_name] = err;
                 }
                 if (!ret.returns.first) {
