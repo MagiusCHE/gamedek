@@ -348,12 +348,22 @@ const $this = {
                 if (!ret.returns.all) {
                     ret.returns.all = {}
                 }
-                ret.returns.all[plugin_name] = await plugin[method].apply(plugin, args)
+                try {
+                    log(`Broadcasting plugin method "${method}" to plugin "${plugin_name}" with args: %o`, args)
+                    ret.returns.all[plugin_name] = await plugin[method].apply(plugin, args)
+                } catch (err) {
+                    logError(`Plugin method "${method}" returned error:`, err);
+                    ret.returns.all[plugin_name] = err;
+                }
                 if (!ret.returns.first) {
                     ret.returns.first = ret.returns.all[plugin_name]
                 }
                 ret.returns.last = ret.returns.all[plugin_name]
             }
+        }
+        if (ret.returns.last instanceof Error) {
+            logError(`Plugin method "${method}" returned error:`, ret.returns.last);
+            throw ret.returns.last;
         }
         return ret
     },
@@ -404,7 +414,7 @@ const $this = {
         if (!global.production || global.openDevTools) {
             $this.openDevTools()
         }
-        
+
         // Listen for window move events
         $this.mainWindow.on('move', () => {
             $this.sendEvent('onWindowMoved')
@@ -473,7 +483,7 @@ const $this = {
         const { screen } = require('electron')
         const displays = screen.getAllDisplays()
         let isVisible = false
-        
+
         // Check if the window would be visible on any display
         for (const display of displays) {
             const { x, y, width, height } = display.bounds
@@ -483,7 +493,7 @@ const $this = {
                 break
             }
         }
-        
+
         // If window would be off-screen, center it on primary display
         if (!isVisible) {
             const primaryDisplay = screen.getPrimaryDisplay()
@@ -492,7 +502,7 @@ const $this = {
             bounds.y = Math.floor((height - bounds.height) / 2)
             log(`Window would be off-screen, centering to %o`, { x: bounds.x, y: bounds.y })
         }
-        
+
         log(`Window bounds are set to %o`, bounds)
         $this.mainWindow.setBounds(bounds)
     },
