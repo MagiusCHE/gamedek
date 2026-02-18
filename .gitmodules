@@ -1,33 +1,33 @@
 [submodule "plugins/gamelib.scraper"]
 	path = plugins/gamelib.scraper
-	url = https://github.com/MagiusCHE/gamedek-plugin-gamelib-scraper.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-gamelib-scraper.git
 [submodule "plugins/gamelib.common"]
 	path = plugins/gamelib.common
-	url = https://github.com/MagiusCHE/gamedek-plugin-gamelib-common.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-gamelib-common.git
 [submodule "plugins/gamelib.linux"]
 	path = plugins/gamelib.linux
-	url = https://github.com/MagiusCHE/gamedek-plugin-gamelib-linux.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-gamelib-linux.git
 [submodule "plugins/gamelib.lutris"]
 	path = plugins/gamelib.lutris
-	url = https://github.com/MagiusCHE/gamedek-plugin-gamelib-lutris.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-gamelib-lutris.git
 [submodule "plugins/gamelib.manager"]
 	path = plugins/gamelib.manager
-	url = https://github.com/MagiusCHE/gamedek-plugin-gamelib-manager.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-gamelib-manager.git
 [submodule "plugins/gamelib.steam"]
 	path = plugins/gamelib.steam
-	url = https://github.com/MagiusCHE/gamedek-plugin-gamelib-steam.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-gamelib-steam.git
 [submodule "plugins/localization"]
 	path = plugins/localization
-	url = https://github.com/MagiusCHE/gamedek-plugin-localization.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-localization.git
 [submodule "plugins/scraper.steam"]
 	path = plugins/scraper.steam
-	url = https://github.com/MagiusCHE/gamedek-plugin-scraper-steam.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-scraper-steam.git
 [submodule "plugins/service.curl"]
 	path = plugins/service.curl
-	url = https://github.com/MagiusCHE/gamedek-plugin-service-curl.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-service-curl.git
 [submodule "plugins/service.exec"]
 	path = plugins/service.exec
-	url = https://github.com/MagiusCHE/gamedek-plugin-service-exec.git
+	url = git@github.com:MagiusCHE/gamedek-plugin-service-exec.git
 [submodule "themes/default"]
 	path = themes/default
-	url = https://github.com/MagiusCHE/gamedek-theme-default.git
+	url = git@github.com:MagiusCHE/gamedek-theme-default.git
